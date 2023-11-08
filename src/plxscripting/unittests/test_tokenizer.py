@@ -24,10 +24,11 @@ from ..plx_scripting_exceptions import PlxScriptingTokenizerError
 
 
 def test_successful_tokenization():
-    con = mock_connection.HTTPConnection('fake_host', 12345)
+    con = mock_connection.HTTPConnection("fake_host", 12345)
     s = server.Server(con, plxproxyfactory.PlxProxyFactory(con), server.InputProcessor())
 
-    tokenizer = s.tokenize('addpoint Polygon_2 0 4.2 0 # comment')  # 'command object "param" "param2" 2 3 4'
+    # 'command object "param" "param2" 2 3 4'
+    tokenizer = s.tokenize("addpoint Polygon_2 0 4.2 0 # comment")
     assert tokenizer.success
     assert tokenizer.error_position == -1
     assert tokenizer.tokens == tokenizer.partial_tokens
@@ -39,7 +40,7 @@ def test_successful_tokenization():
     assert token.position == 0
     assert token.length == 7
     assert token.end_position == 6
-    assert token.value == 'command'
+    assert token.value == "command"
 
     assert tokens[2].value == '"param"'
 
@@ -47,28 +48,28 @@ def test_successful_tokenization():
 
 
 def test_unsuccessful_tokenization():
-    con = mock_connection.HTTPConnection('fake_host', 12345)
+    con = mock_connection.HTTPConnection("fake_host", 12345)
     s = server.Server(con, plxproxyfactory.PlxProxyFactory(con), server.InputProcessor())
 
     con.test_success = False
-    tokenizer = s.tokenize('abc ?')
+    tokenizer = s.tokenize("abc ?")
     with pytest.raises(PlxScriptingTokenizerError) as exception_info:
         tokenizer.tokens
-    assert str(exception_info.value) == 'Unrecognized token at position 5'
+    assert str(exception_info.value) == "Unrecognized token at position 5"
     assert not tokenizer.success
-    assert tokenizer.error == 'Unrecognized token at position 5'
+    assert tokenizer.error == "Unrecognized token at position 5"
     assert tokenizer.error_position == 5
     assert len(tokenizer.partial_tokens) == 1  # Since the first token is OK
 
 
 def test_external_interpreter():
-    con = mock_connection.HTTPConnection('fake_host', 12345)
+    con = mock_connection.HTTPConnection("fake_host", 12345)
     s = server.Server(con, plxproxyfactory.PlxProxyFactory(con), server.InputProcessor())
 
     con.test_tokenize_external = True
     tokenizer = s.tokenize('/command object "param" "param2" 2 3 4')
 
     token = tokenizer.tokens[0]
-    assert token.interpretername == 'command'
+    assert token.interpretername == "command"
     assert token.externalcommand == 'object "param" "param2" 2 3 4'
     assert token.content == '/command object "param" "param2" 2 3 4'

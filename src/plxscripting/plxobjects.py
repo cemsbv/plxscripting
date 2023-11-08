@@ -18,7 +18,8 @@ PURPOSE, QUIET ENJOYMENT, OR NON-INFRINGEMENT. See the PPL for specific
 language governing rights and limitations under the PPL.
 """
 
-from .const import (MEMBERSUBLIST, MEMBERINDEX)
+from .const import MEMBERSUBLIST, MEMBERINDEX
+
 # used to import PlxProxyObject, but not referencing it directly,
 # otherwise cannot import because of circular reference
 from . import plxproxy
@@ -47,9 +48,11 @@ class PlxObjectPropertyList:
         if self._property_type is None:
             try:
                 self._ensure_objects_cache_exists_for_key(0)
-                self._property_type = self._owner_objects_cache[0].__getattr__(self._property_name)._plx_type
+                self._property_type = (
+                    self._owner_objects_cache[0].__getattr__(self._property_name)._plx_type
+                )
             except Exception:
-                self._property_type = 'Property'
+                self._property_type = "Property"
 
         return "<{} list>".format(self._property_type)
 
@@ -68,8 +71,7 @@ class PlxObjectPropertyList:
                 raise IndexError("list index out of range")
 
         else:
-            raise TypeError("list indices must be integers, not {}".format(
-                key.__class__.__name__))
+            raise TypeError("list indices must be integers, not {}".format(key.__class__.__name__))
 
         self._owner_objects_cache[key] = self._listable_parent[key]
 
@@ -80,38 +82,45 @@ class PlxObjectPropertyList:
         self._ensure_objects_cache_exists_for_key(key)
 
         if isinstance(key, slice):
-            return self._server.get_objects_property(proxy_objects=self._owner_objects_cache[key],
-                                                     prop_name=self._property_name,
-                                                     phase_object=self._phase_object)
+            return self._server.get_objects_property(
+                proxy_objects=self._owner_objects_cache[key],
+                prop_name=self._property_name,
+                phase_object=self._phase_object,
+            )
 
         if not isinstance(key, int):
-            raise TypeError("list indices must be integers, not {}".format(
-                key.__class__.__name__))
+            raise TypeError("list indices must be integers, not {}".format(key.__class__.__name__))
 
         if key >= len(self):
             raise IndexError("list index out of range")
 
-        return self._server.get_object_property(proxy_object=self._owner_objects_cache[key],
-                                                prop_name=self._property_name,
-                                                phase_object=self._phase_object)
+        return self._server.get_object_property(
+            proxy_object=self._owner_objects_cache[key],
+            prop_name=self._property_name,
+            phase_object=self._phase_object,
+        )
 
     def _get_properties_for_key(self, key):
         self._ensure_objects_cache_exists_for_key(key)
 
         if isinstance(key, slice):
             return self._server.call_listable_method(
-                self._listable_parent, MEMBERSUBLIST, startindex=key.start, stopindex=key.stop,
-                property_name=self._property_name)
+                self._listable_parent,
+                MEMBERSUBLIST,
+                startindex=key.start,
+                stopindex=key.stop,
+                property_name=self._property_name,
+            )
 
         if not isinstance(key, int):
-            raise TypeError("list indices must be integers, not {}".format(
-                key.__class__.__name__))
+            raise TypeError("list indices must be integers, not {}".format(key.__class__.__name__))
 
         if key >= len(self):
             raise IndexError("list index out of range")
 
-        return self._server.call_listable_method(self._listable_parent, MEMBERINDEX, startindex=key,
-                                                 property_name=self._property_name)
+        return self._server.call_listable_method(
+            self._listable_parent, MEMBERINDEX, startindex=key, property_name=self._property_name
+        )
 
     def __getitem__(self, key):
         if self._phase_object is not None:
@@ -148,8 +157,10 @@ class PlxObjectPropertyList:
         return self._get_value()
 
     def _get_value(self):
-        plx_objects_in_list = self._listable_parent[0:len(self)]
-        properties = self._server.get_objects_property(plx_objects_in_list, self._property_name, self._phase_object)
+        plx_objects_in_list = self._listable_parent[0 : len(self)]
+        properties = self._server.get_objects_property(
+            plx_objects_in_list, self._property_name, self._phase_object
+        )
 
         # For staged IPs, the returned object is a staged IP proxy object and not the value directly,
         # so we query the value here
@@ -174,9 +185,11 @@ class PlxStagedIPList:
         # by defining __getitem__, the object can be iterated in a for loop with an integer key starting from 0.
         # if no exception is raised, the for loop is infinite. The following check solves this.
         if not isinstance(phase_object, plxproxy.PlxProxyObject):
-            raise TypeError('Expected phase object key')
+            raise TypeError("Expected phase object key")
 
-        return PlxObjectPropertyList(self._server, self._listable_parent, self._property_name, phase_object)
+        return PlxObjectPropertyList(
+            self._server, self._listable_parent, self._property_name, phase_object
+        )
 
     def __repr__(self):
         return "<Staged Property list>"

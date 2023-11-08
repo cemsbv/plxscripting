@@ -3,10 +3,6 @@ Purpose: provides low level methods to fire commands to a server.
     The methods accept commmand line strings and return JSON for parsing by
     the client.
 
-Subversion data:
-    $Id: connection.py 19385 2015-06-01 12:49:43Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/connection.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -31,39 +27,82 @@ import re
 
 import encryption
 
-from .const import (ENVIRONMENT, ACTION, COMMANDS, NAME, FILENAME, INTERNAL_SERVER_ERROR, TOKENIZER, TOKENIZE,
-                    MEMBERS, NAMED_OBJECTS, PROPERTY_VALUES, LIST, NUMBER_OF_RETRIES, SECONDS_DELAY_BEFORE_RETRY,
-                    LIST_QUERIES, ENUMERATION, SELECTION, OWNER, PROPERTYNAME, GETLAST, PEEKLAST,
-                    PHASEGUID, OBJECTS, NULL_GUID, JSON_KEY_RESPONSE,
-                    JSON_KEY_CODE, JSON_KEY_REQUEST_DATA, JSON_KEY_REPLY_CODE, EXCEPTIONS)
+from .const import (
+    ENVIRONMENT,
+    ACTION,
+    COMMANDS,
+    NAME,
+    FILENAME,
+    INTERNAL_SERVER_ERROR,
+    TOKENIZER,
+    TOKENIZE,
+    MEMBERS,
+    NAMED_OBJECTS,
+    PROPERTY_VALUES,
+    LIST,
+    NUMBER_OF_RETRIES,
+    SECONDS_DELAY_BEFORE_RETRY,
+    LIST_QUERIES,
+    ENUMERATION,
+    SELECTION,
+    OWNER,
+    PROPERTYNAME,
+    GETLAST,
+    PEEKLAST,
+    PHASEGUID,
+    OBJECTS,
+    NULL_GUID,
+    JSON_KEY_RESPONSE,
+    JSON_KEY_CODE,
+    JSON_KEY_REQUEST_DATA,
+    JSON_KEY_REPLY_CODE,
+    EXCEPTIONS,
+)
 
-from .plx_scripting_exceptions import PlxScriptingError, EncryptionError, PlxScriptingPreconditionError
+from .plx_scripting_exceptions import (
+    PlxScriptingError,
+    EncryptionError,
+    PlxScriptingPreconditionError,
+)
 
 JSON_HEADER = {"content-type": "application/json"}
-MAD_EXCEPTION_ITEMS_TO_KEEP = ['operating system', 'program up time', 'processors', 'physical memory',
-                               'free disk space', 'executable', 'version   ', 'exception class', 'exception message']
+MAD_EXCEPTION_ITEMS_TO_KEEP = [
+    "operating system",
+    "program up time",
+    "processors",
+    "physical memory",
+    "free disk space",
+    "executable",
+    "version   ",
+    "exception class",
+    "exception message",
+]
 
 
 def clean_mad_exception_log(exception):
-    matches = re.findall(r'^(.*): (.*)$', exception, re.MULTILINE)
-    matches = [match for match in matches if any([item in match[0] for item in MAD_EXCEPTION_ITEMS_TO_KEEP])]
+    matches = re.findall(r"^(.*): (.*)$", exception, re.MULTILINE)
+    matches = [
+        match
+        for match in matches
+        if any([item in match[0] for item in MAD_EXCEPTION_ITEMS_TO_KEEP])
+    ]
 
     is_async_exception = False
     for index, match in enumerate(matches):
-        if 'Original call stack' in match[0]:
+        if "Original call stack" in match[0]:
             is_async_exception = True
-            matches[index] = (match[0].replace('Original call stack', '') + '\r\n').split(': ')
-    cleaned_exception = '\n'.join(['{}: {}'.format(*match) for match in matches])
+            matches[index] = (match[0].replace("Original call stack", "") + "\r\n").split(": ")
+    cleaned_exception = "\n".join(["{}: {}".format(*match) for match in matches])
 
     if is_async_exception:
-        start_tag = 'thread'
-        end_tag = 'main thread'
+        start_tag = "thread"
+        end_tag = "main thread"
     else:
-        start_tag = 'main thread'
-        end_tag = 'thread'
-    main_thread = re.search(r'{} .*?:.*?{}'.format(start_tag, end_tag), exception, re.DOTALL)
+        start_tag = "main thread"
+        end_tag = "thread"
+    main_thread = re.search(r"{} .*?:.*?{}".format(start_tag, end_tag), exception, re.DOTALL)
     if main_thread:
-        cleaned_exception += '\n' + main_thread.group(0).replace('\r\n{}'.format(end_tag), '')
+        cleaned_exception += "\n" + main_thread.group(0).replace("\r\n{}".format(end_tag), "")
     return cleaned_exception
 
 
@@ -93,16 +132,16 @@ class EncryptionHandler(object):
 
     def encrypt(self, payload):
         if JSON_KEY_REPLY_CODE in payload:
-            raise EncryptionError("Payload must not have {} field before"
-                                  " encryption.".format(JSON_KEY_REPLY_CODE))
+            raise EncryptionError(
+                "Payload must not have {} field before encryption.".format(JSON_KEY_REPLY_CODE)
+            )
 
         self._reply_code = uuid.uuid4().hex
         payload[JSON_KEY_REPLY_CODE] = self._reply_code
         jsondata = json.dumps(payload)
         self._last_request_data = jsondata
 
-        encrypted_jsondata, init_vector = encryption.encrypt(
-            jsondata, self._password)
+        encrypted_jsondata, init_vector = encryption.encrypt(jsondata, self._password)
 
         outer = {}
         outer[JSON_KEY_CODE] = init_vector
@@ -113,8 +152,9 @@ class EncryptionHandler(object):
         response_json = response.json()
         encrypted_response = response_json[JSON_KEY_RESPONSE]
         init_vector = response_json[JSON_KEY_CODE]
-        decrypted_response_text = encryption.decrypt(encrypted_response, init_vector,
-                                                     self._password)
+        decrypted_response_text = encryption.decrypt(
+            encrypted_response, init_vector, self._password
+        )
 
         if len(decrypted_response_text) == 0:
             raise EncryptionError("Couldn't decrypt response.")
@@ -122,19 +162,20 @@ class EncryptionHandler(object):
         decrypted_response = json.loads(decrypted_response_text)
         # Detect possible MITM attacks by verifying the reply code.
         if decrypted_response[JSON_KEY_REPLY_CODE] != self._reply_code:
-            raise EncryptionError("Reply code is different from what "
-                                  "was sent! Server might be spoofed!")
+            raise EncryptionError(
+                "Reply code is different from what was sent! Server might be spoofed!"
+            )
 
         return Response(response, decrypted_response_text, decrypted_response)
 
 
-class HTTPConnection():
+class HTTPConnection:
     """
     Simple helper class which provides methods to make http requests to
     a server. Accepts string input and provides JSON output.
     """
 
-    def __init__(self, host, port, timeout=5.0, request_timeout=None, password='', error_mode=None):
+    def __init__(self, host, port, timeout=5.0, request_timeout=None, password="", error_mode=None):
         self.host = host
         self.port = port
         self.timeout = timeout
@@ -147,20 +188,17 @@ class HTTPConnection():
 
         self.HTTP_HOST_PREFIX = "http://{0}:{1}/".format(host, str(port))
 
-        self.ENVIRONMENT_ACTION_PREFIX = (self.HTTP_HOST_PREFIX + ENVIRONMENT)
+        self.ENVIRONMENT_ACTION_PREFIX = self.HTTP_HOST_PREFIX + ENVIRONMENT
 
-        self.COMMAND_ACTION_PREFIX = (self.HTTP_HOST_PREFIX + COMMANDS)
+        self.COMMAND_ACTION_PREFIX = self.HTTP_HOST_PREFIX + COMMANDS
 
-        self.QUERY_MEMBER_NAMES_ACTION_PREFIX = (
-                self.HTTP_HOST_PREFIX + MEMBERS)
+        self.QUERY_MEMBER_NAMES_ACTION_PREFIX = self.HTTP_HOST_PREFIX + MEMBERS
 
-        self.QUERY_NAMED_OBJECT_ACTION_PREFIX = (
-                self.HTTP_HOST_PREFIX + NAMED_OBJECTS)
+        self.QUERY_NAMED_OBJECT_ACTION_PREFIX = self.HTTP_HOST_PREFIX + NAMED_OBJECTS
 
-        self.QUERY_PROPERTY_VALUES_ACTION_PREFIX = (
-                self.HTTP_HOST_PREFIX + PROPERTY_VALUES)
+        self.QUERY_PROPERTY_VALUES_ACTION_PREFIX = self.HTTP_HOST_PREFIX + PROPERTY_VALUES
 
-        self.QUERY_LIST_PREFIX = (self.HTTP_HOST_PREFIX + LIST)
+        self.QUERY_LIST_PREFIX = self.HTTP_HOST_PREFIX + LIST
 
         self.QUERY_ENUMERATION_PREFIX = self.HTTP_HOST_PREFIX + ENUMERATION
 
@@ -224,8 +262,8 @@ class HTTPConnection():
                 retry_response = self._retry_request(operation_address, payload.copy())
                 if retry_response:
                     return retry_response
-                cleaned_log = clean_mad_exception_log(response.json().get('bugreport', ''))
-                error = PlxScriptingError('\n'.join([response.reason, cleaned_log]))
+                cleaned_log = clean_mad_exception_log(response.json().get("bugreport", ""))
+                error = PlxScriptingError("\n".join([response.reason, cleaned_log]))
                 self._trigger_error_mode_behavior(error)
             else:
                 raise PlxScriptingError(response.reason)
@@ -246,7 +284,11 @@ class HTTPConnection():
         response = self._make_request(operation_address, json_payload)
         # We can only decrypt json content
         # Some APIs do not set a response object. In that case don't try to decrypt
-        if self._password and 'json' in response.headers.get('Content-Type', '') and response.text != '':
+        if (
+            self._password
+            and "json" in response.headers.get("Content-Type", "")
+            and response.text != ""
+        ):
             response = encryption_handler.decrypt(response)
 
         if self.logger is not None:
@@ -262,14 +304,15 @@ class HTTPConnection():
         :param str json_payload: The json string to be send as payload
         :return: The request response
         """
-        response = self.session.post(operation_address, data=json_payload,
-                                     headers=JSON_HEADER, timeout=self.request_timeout)
-        content_length = response.headers.get('content-length')
+        response = self.session.post(
+            operation_address, data=json_payload, headers=JSON_HEADER, timeout=self.request_timeout
+        )
+        content_length = response.headers.get("content-length")
         if content_length and len(response.content) != int(content_length):
             return self._make_request(operation_address, json_payload)
         return response
 
-    def request_environment(self, command_string, filename=''):
+    def request_environment(self, command_string, filename=""):
         """
         Send a Plaxis environment command to the server, such as creating a
         new project. A specific filename may be provided when opening a
@@ -317,9 +360,7 @@ class HTTPConnection():
         while properties that are objects are represented as GUIDs.
         """
         property_values_json = [
-            {OWNER: owner_guid,
-             PROPERTYNAME: property_name,
-             PHASEGUID: phase_guid}
+            {OWNER: owner_guid, PROPERTYNAME: property_name, PHASEGUID: phase_guid}
             for owner_guid in owner_guids
         ]
 
@@ -329,8 +370,7 @@ class HTTPConnection():
             property_values_json = property_values_json[0]
 
         payload = {ACTION: {PROPERTY_VALUES: property_values_json}}
-        request = self._send_request(
-            self.QUERY_PROPERTY_VALUES_ACTION_PREFIX, payload)
+        request = self._send_request(self.QUERY_PROPERTY_VALUES_ACTION_PREFIX, payload)
         return request.json()
 
     def request_list(self, *list_queries):
@@ -367,8 +407,10 @@ class HTTPConnection():
         Send a query to the server to capture the server name from response headers
         """
         payload = {ACTION: {MEMBERS: [NULL_GUID]}}
-        response = self._send_request_and_get_response(self.QUERY_MEMBER_NAMES_ACTION_PREFIX, payload)
-        return response.headers.get('Server')
+        response = self._send_request_and_get_response(
+            self.QUERY_MEMBER_NAMES_ACTION_PREFIX, payload
+        )
+        return response.headers.get("Server")
 
     def request_exceptions(self, clear=True):
         """

@@ -30,6 +30,9 @@ the PLAXIS program you need to use.
 | :------------------------------------: | :----------------: |
 | PLAXIS 2D CONNECT Edition V22 Update 2 |       1.0.2        |
 
+| PLAXIS 3D Versions | Repository Version |
+| :----------------: | :----------------: |
+|  PLAXIS 3D 2023.2  |       1.0.4        |
 
 # Contribution
 
@@ -80,11 +83,11 @@ pip install pip-tools
 Generate requirements.txt file with:
 
 ```bash
-pip-compile --extra=test --extra=lint --extra=docs --output-file=requirements.txt pyproject.toml
+pip-compile --extra=test --output-file=requirements.txt pyproject.toml
 ```
 
 Update the requirements within the defined ranges with:
 
 ```bash
-pip-compile --upgrade --extra=test --extra=lint --extra=docs --output-file=requirements.txt pyproject.toml
+pip-compile --upgrade --extra=test --output-file=requirements.txt pyproject.toml
 ```

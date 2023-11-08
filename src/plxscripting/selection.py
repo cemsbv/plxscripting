@@ -83,4 +83,3 @@ class Selection(object):
 
     def __delitem__(self, index):
         self.remove(self._objects[index])
-

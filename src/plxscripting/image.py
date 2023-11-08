@@ -1,10 +1,6 @@
 """
 Purpose: Provide objects that represent an image created by the server.
 
-Subversion data:
-    $Id: image.py 19791 2015-07-16 13:26:27Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/image.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -25,7 +21,7 @@ import io
 import codecs
 
 
-TYPE_NAME_IMAGE = 'image/png'
+TYPE_NAME_IMAGE = "image/png"
 
 
 class ImageBytesWrapper(object):
@@ -42,7 +38,7 @@ class ImageBytesWrapper(object):
         return self._image_bytes
 
     def save(self, path):
-        with open(path, 'wb') as image_file:
+        with open(path, "wb") as image_file:
             image_file.write(self._image_bytes)
 
 
@@ -64,14 +60,15 @@ class PILImageWrapper(object):
 
 
 def create_image(json_object):
-    if 'data' not in json_object:
+    if "data" not in json_object:
         raise Exception("JSON for image must contain 'data' property.")
 
-    image_bytes_base64 = json_object['data'].encode('ascii')
-    image_bytes = codecs.decode(image_bytes_base64, 'base64')
+    image_bytes_base64 = json_object["data"].encode("ascii")
+    image_bytes = codecs.decode(image_bytes_base64, "base64")
 
     try:
         from PIL import Image
+
         image = Image.open(io.BytesIO(image_bytes))
         return PILImageWrapper(image)
     except ImportError:

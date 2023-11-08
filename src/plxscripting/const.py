@@ -1,10 +1,6 @@
 """
 Purpose: Constants for the plxscripting package
 
-Subversion data:
-    $Id: const.py 19744 2015-07-10 12:52:29Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/const.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -49,7 +45,7 @@ NAME = "name"
 FILENAME = "filename"
 LIST_QUERIES = "listqueries"
 GUID = "guid"
-TOKENIZE = 'tokenize'
+TOKENIZE = "tokenize"
 
 COUNT = "count"
 METHOD = "method"
@@ -67,8 +63,8 @@ PHASEGUID = "phaseguid"
 STAGED_PREFIX = "staged."
 OBJECTS = "objects"
 
-GETLAST = 'getlast'
-PEEKLAST = 'peeklast'
+GETLAST = "getlast"
+PEEKLAST = "peeklast"
 
 # REST API response strings
 JSON_COMMANDS = "commands"
@@ -87,21 +83,21 @@ JSON_CMDLINE_NAME = "commandlinename"
 JSON_PROPERTIES = "properties"
 JSON_NAMEDOBJECTS = "namedobjects"
 JSON_ISLISTABLE = "islistable"
-JSON_OWNERGUID = 'ownerguid'
+JSON_OWNERGUID = "ownerguid"
 JSON_LISTQUERIES = "listqueries"
 JSON_METHODNAME = "methodname"
 JSON_OUTPUTDATA = "outputdata"
 JSON_MEMBERNAMES = "membernames"
 JSON_ENUMVALUES = "enumvalues"
 JSON_TYPE_JSON = "JSON"
-JSON_KEY_JSON = 'json'
-JSON_KEY_CONTENT_TYPE = 'ContentType'
-JSON_KEY_REPLY_CODE = 'ReplyCode'
-JSON_KEY_CODE = 'Code'
-JSON_KEY_RESPONSE = 'Response'
-JSON_KEY_REQUEST_DATA = 'RequestData'
-JSON_NAME = 'Name'
-JSON_HEADERS = 'headers'
+JSON_KEY_JSON = "json"
+JSON_KEY_CONTENT_TYPE = "ContentType"
+JSON_KEY_REPLY_CODE = "ReplyCode"
+JSON_KEY_CODE = "Code"
+JSON_KEY_RESPONSE = "Response"
+JSON_KEY_REQUEST_DATA = "RequestData"
+JSON_NAME = "Name"
+JSON_HEADERS = "headers"
 
 # Unit test "recorder"
 RECORDER_FOLDER = "recorder"
@@ -111,39 +107,31 @@ RECORDER_RESULTS_FILENAME_EXT = ".json"
 
 # Other constants
 PLX_GLOBAL = "GLOBAL"
-NULL_GUID = '{00000000-0000-0000-0000-000000000000}'
+NULL_GUID = "{00000000-0000-0000-0000-000000000000}"
 
 # Command line argument constants
-ARG_APP_SERVER_ADDRESS = 'AppServerAddress'
-ARG_APP_SERVER_PORT = 'AppServerPort'
-ARG_PASSWORD = 'AppServerPassword'
-ARG_APP_SERVER_TYPE = 'AppServerType'
+ARG_APP_SERVER_ADDRESS = "AppServerAddress"
+ARG_APP_SERVER_PORT = "AppServerPort"
+ARG_PASSWORD = "AppServerPassword"
+ARG_APP_SERVER_TYPE = "AppServerType"
 
 # PLAXIS application types to server & global variable suffix
 INPUT = "input"
 OUTPUT = "output"
 SOILTEST = "soiltest"
 
-APP_SERVER_TYPE_TO_VARIABLE_SUFFIX = {
-    INPUT: 'i',
-    OUTPUT: 'o',
-    SOILTEST: 't'
-}
-APP_SERVER_TYPE_TO_DEFAULT_SERVER_PORT = {
-    INPUT: 10000,
-    OUTPUT: 10001,
-    SOILTEST: 10002
-}
+APP_SERVER_TYPE_TO_VARIABLE_SUFFIX = {INPUT: "i", OUTPUT: "o", SOILTEST: "t"}
+APP_SERVER_TYPE_TO_DEFAULT_SERVER_PORT = {INPUT: 10000, OUTPUT: 10001, SOILTEST: 10002}
 
 # Selection commands
-SELECTION_GET = 'get'
-SELECTION_SET = 'set'
-SELECTION_APPEND = 'append'
-SELECTION_REMOVE = 'remove'
+SELECTION_GET = "get"
+SELECTION_SET = "set"
+SELECTION_APPEND = "append"
+SELECTION_REMOVE = "remove"
 
 # Server names
-PLAXIS_2D = 'PLAXIS 2D'
-PLAXIS_3D = 'PLAXIS 3D'
+PLAXIS_2D = "PLAXIS 2D"
+PLAXIS_3D = "PLAXIS 3D"
 
 PLAXIS_PATH = "plaxis_path"
 PLAXIS_VERSION = "plaxis_version"
@@ -156,11 +144,11 @@ PLAXIS_2D_OUTPUT_EXECUTABLE_FILENAME = "Plaxis2DOutput.exe"
 PLAXIS_3D_OUTPUT_EXECUTABLE_FILENAME = "Plaxis3DOutput.exe"
 
 # Error mode
-INTERPRETER = 'interpreter'
-RAISE = 'raise'
-RETRY = 'retry'
-PRECONDITION = 'precondition'
-NOCLEAR = 'noclear'
+INTERPRETER = "interpreter"
+RAISE = "raise"
+RETRY = "retry"
+PRECONDITION = "precondition"
+NOCLEAR = "noclear"
 NUMBER_OF_RETRIES = 1
 SECONDS_DELAY_BEFORE_RETRY = 0.2
 

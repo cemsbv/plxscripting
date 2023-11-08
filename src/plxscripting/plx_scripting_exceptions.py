@@ -1,10 +1,6 @@
 """
 Purpose: exceptions for the plxscripting package.
 
-Subversion data:
-    $Id: plx_scripting_exceptions.py 13488 2013-09-04 13:21:01Z ac $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/plx_scripting_exceptions.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -30,18 +26,18 @@ class PlxScriptingError(Exception):
 
 
 class EncryptionError(Exception):
-    """ Can be raised for all kinds of encryption related problems """
+    """Can be raised for all kinds of encryption related problems"""
 
 
 class PlxScriptingLocalError(Exception):
-    """ This exception can be raised for client-side errors
+    """This exception can be raised for client-side errors
     that happens before we send commands to server or while
     we processing the results"""
 
 
 class PlxScriptingPreconditionError(Exception):
-    """ Base class for exceptions raised when there was an error on server-side before the request was made """
+    """Base class for exceptions raised when there was an error on server-side before the request was made"""
 
 
 class PlxScriptingTokenizerError(Exception):
-    """ Base class for exceptions raised when there was an error while tokenizing """
+    """Base class for exceptions raised when there was an error while tokenizing"""
