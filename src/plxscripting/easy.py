@@ -1,10 +1,6 @@
 """
 Purpose: Gives some very easy-to-use wrappers than can be imported in one go
 
-Subversion data:
-    $Id: easy.py 19675 2015-07-01 14:31:55Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/easy.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -22,13 +18,22 @@ language governing rights and limitations under the PPL.
 """
 import sys
 
-from .const import LOCAL_HOST, ARG_APP_SERVER_ADDRESS, ARG_APP_SERVER_PORT, ARG_PASSWORD, PLAXIS_3D, PLAXIS_2D
+from .const import (
+    LOCAL_HOST,
+    ARG_APP_SERVER_ADDRESS,
+    ARG_APP_SERVER_PORT,
+    ARG_PASSWORD,
+    PLAXIS_3D,
+    PLAXIS_2D,
+)
 from .server import new_server as n_serv
 from .console import inplace_console as console
 from .console import get_equivalent, ge
 
 
-def new_server(address=None, port=None, timeout=5.0, request_timeout=None, password=None, error_mode=()):
+def new_server(
+    address=None, port=None, timeout=5.0, request_timeout=None, password=None, error_mode=()
+):
     invoking_module_namespace = sys._getframe(1).f_locals
     ns_keys = list(invoking_module_namespace.keys())
 
@@ -41,5 +46,11 @@ def new_server(address=None, port=None, timeout=5.0, request_timeout=None, passw
     if password is None and ARG_PASSWORD in ns_keys:
         password = invoking_module_namespace[ARG_PASSWORD]
 
-    return n_serv(address=address, port=port, timeout=timeout, request_timeout=request_timeout,
-                  password=password, error_mode=error_mode)
+    return n_serv(
+        address=address,
+        port=port,
+        timeout=timeout,
+        request_timeout=request_timeout,
+        password=password,
+        error_mode=error_mode,
+    )

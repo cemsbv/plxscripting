@@ -22,25 +22,24 @@ import plxscripting.const as const
 
 
 class MockProxyObject(PlxProxyObject):
-
     def __init__(self, server, guid):
-        super(MockProxyObject, self).__init__(server, guid, 'MockProxyObject')
+        super(MockProxyObject, self).__init__(server, guid, "MockProxyObject")
 
 
 class MockProxyObjectProperty(PlxProxyObjectProperty):
-
     def __init__(self, server, guid, owner, name):
-        super(MockProxyObjectProperty, self).__init__(server, guid, 'MockProxyObjectProperty', name, owner)
+        super(MockProxyObjectProperty, self).__init__(
+            server, guid, "MockProxyObjectProperty", name, owner
+        )
 
 
 class Server:
-
     def __init__(self):
         self._function_call_count = 0
         self.proxies_to_reset = []
         self.object_property_store = None
         self.object_property_phase_store = None
-        self.object_property_to_send = 'uninitialized'
+        self.object_property_to_send = "uninitialized"
         self.listable_count = 5
 
     def log_function_call(self):
@@ -59,14 +58,16 @@ class Server:
 
     def get_object_attributes(self, obj):
         attributes = {
-            'test_attribute': 12345,
-            'UserFeatures': '',  # MockProxyObject(self, 'abcde'),
-            'test_property_except_listable': MockProxyObjectProperty(self, 'mock_property_guid', obj, 'test_property_except_listable'),
-            'delete': self.log_function_call
+            "test_attribute": 12345,
+            "UserFeatures": "",  # MockProxyObject(self, 'abcde'),
+            "test_property_except_listable": MockProxyObjectProperty(
+                self, "mock_property_guid", obj, "test_property_except_listable"
+            ),
+            "delete": self.log_function_call,
         }
 
         if isinstance(obj, PlxProxyListable):
-            del attributes['test_property_except_listable']
+            del attributes["test_property_except_listable"]
 
         return attributes
 
@@ -81,26 +82,34 @@ class Server:
         self.object_property_store = prop_value
         return True
 
-    def call_listable_method(self, proxy_listable, method_name, startindex=None, stopindex=None, property_name=None):
+    def call_listable_method(
+        self, proxy_listable, method_name, startindex=None, stopindex=None, property_name=None
+    ):
         if method_name == const.COUNT:
             return self.listable_count
         elif method_name == const.SUBLIST:
-            return ['mock_call_listable_method::command:{}::index:{}'.format(method_name, i) for i in
-                    range(startindex, stopindex)]
+            return [
+                "mock_call_listable_method::command:{}::index:{}".format(method_name, i)
+                for i in range(startindex, stopindex)
+            ]
         elif method_name == const.INDEX:
-            return 'mock_call_listable_method::command:{}::index:{}'.format(method_name, startindex)
+            return "mock_call_listable_method::command:{}::index:{}".format(method_name, startindex)
         elif method_name == const.MEMBERSUBLIST:
-            return ['mock_call_listable_method::command:{}::index:{}::member_names:{}'.format(method_name, i,
-                                                                                              [property_name]) for i in
-                    range(startindex, stopindex)]
+            return [
+                "mock_call_listable_method::command:{}::index:{}::member_names:{}".format(
+                    method_name, i, [property_name]
+                )
+                for i in range(startindex, stopindex)
+            ]
         elif method_name == const.MEMBERINDEX:
-            return 'mock_call_listable_method::command:{}::index:{}::member_names:{}'.format(method_name, startindex,
-                                                                                             [property_name])
+            return "mock_call_listable_method::command:{}::index:{}::member_names:{}".format(
+                method_name, startindex, [property_name]
+            )
         else:
-            return 'mock_call_listable_method::command:{}'.format(method_name)
+            return "mock_call_listable_method::command:{}".format(method_name)
 
     def call_plx_object_method(self, proxy_obj, method_name, params):
-        return '{}.{}({})'.format(proxy_obj, method_name, ', '.join([repr(p) for p in params]))
+        return "{}.{}({})".format(proxy_obj, method_name, ", ".join([repr(p) for p in params]))
 
     def call_selection_command(self, command, *args):
         return [str(a) for a in args]

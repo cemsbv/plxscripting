@@ -1,10 +1,6 @@
 """
 Purpose: Interfaces for logging things in the scripting layer.
 
-Subversion data:
-    $Id: logger.py 16029 2014-03-28 16:00:15Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/logger.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -44,12 +40,12 @@ class Logger(object):
     def __init__(self, **kwargs):
         super(Logger, self).__init__()
 
-        if 'file' in kwargs:
-            self._file = kwargs['file']
-        elif 'path' in kwargs:
-            self._file = open(kwargs['path'], 'w')
+        if "file" in kwargs:
+            self._file = kwargs["file"]
+        elif "path" in kwargs:
+            self._file = open(kwargs["path"], "w")
         else:
-            self._file = open(_getDefaultLogPath(), 'w')
+            self._file = open(_getDefaultLogPath(), "w")
 
         self._request_start_time = 0
         self._payload = ""
@@ -63,14 +59,18 @@ class Logger(object):
         ms_duration = int(1000.0 * duration)
         isodate = datetime.datetime.now().isoformat()
         request_text = "[{date}][{duration}ms][{status}({reason})][{url}]\n".format(
-            date=isodate, duration=ms_duration, status=request.status_code,
-            reason=request.reason, url=request.url)
+            date=isodate,
+            duration=ms_duration,
+            status=request.status_code,
+            reason=request.reason,
+            url=request.url,
+        )
         self._file.write(request_text)
 
         self._file.write("Payload: {}\n".format(self._payload))
         self._file.write("Returned Headers: {}\n".format(dumps(dict(request.headers))))
 
         # The returned text contains double newlines, which is somewhat annoying to read.
-        returned = request.text.replace('\x0D\x0A', '\n')
+        returned = request.text.replace("\x0d\x0a", "\n")
         self._file.write("Returned: {}\n".format(returned))
         self._file.flush()

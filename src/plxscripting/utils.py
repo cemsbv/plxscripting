@@ -24,12 +24,14 @@ def force_list(func):
     """
     Decorator that forces the result to be a list or None
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
         if result is None or isinstance(result, list):
             return result
         return [result]
+
     return wrapper
 
 

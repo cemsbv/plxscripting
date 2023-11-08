@@ -4,10 +4,6 @@ Purpose: provide objects which act as a remote proxy to their
     objects using Python without requiring knowledge of the underlying
     communication.
 
-Subversion data:
-    $Id: plxproxy.py 21333 2016-02-22 14:14:52Z tj $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/plxscripting/plxproxy.py $
-
 Copyright (c) Plaxis bv. All rights reserved.
 
 Unless explicitly acquired and licensed from Licensor under another
@@ -29,11 +25,11 @@ import abc
 from .plx_scripting_exceptions import PlxScriptingError
 from .plxobjects import PlxObjectPropertyList, PlxStagedIPList
 from .selection import Selection
-from .const import (COUNT, SUBLIST, INDEX, STAGED_PREFIX, SELECTION)
+from .const import COUNT, SUBLIST, INDEX, STAGED_PREFIX, SELECTION
 
 
 class PlxProxyObject_Abstract(object):
-    """ Abstract base class for plaxis proxy objects. """
+    """Abstract base class for plaxis proxy objects."""
 
     def __init__(self, server, guid):
         self._attr_cache = {}
@@ -42,7 +38,7 @@ class PlxProxyObject_Abstract(object):
 
     @abc.abstractmethod
     def __repr__(self):
-        """ Returns a representation of the object """
+        """Returns a representation of the object"""
         return
 
     @property
@@ -52,7 +48,7 @@ class PlxProxyObject_Abstract(object):
 
     @abc.abstractmethod
     def _ensure_cache_is_valid(self):
-        """ Ensures that the attribute cache is up to date """
+        """Ensures that the attribute cache is up to date"""
         return
 
     def get_cmd_line_repr(self):
@@ -66,8 +62,7 @@ class PlxProxyObject_Abstract(object):
         """
         Return all attributes of the object (both from Plaxis and locally)
         """
-        return dir(super(PlxProxyObject_Abstract, self)) + list(
-            self.attr_cache)
+        return dir(super(PlxProxyObject_Abstract, self)) + list(self.attr_cache)
 
     def get_equivalent(self, object=None):
         if object is None:
@@ -84,8 +79,7 @@ class PlxProxyObject_Abstract(object):
             return self._server.get_named_object(object_name)
         except PlxScriptingError:
             pass
-        raise AttributeError(
-            "Requested object '{}' is not present".format(object_name))
+        raise AttributeError("Requested object '{}' is not present".format(object_name))
 
 
 class PlxProxyGlobalObject(PlxProxyObject_Abstract):
@@ -151,7 +145,7 @@ class PlxProxyGlobalObject(PlxProxyObject_Abstract):
         # e.g. the Lines object and a Line_1 object. Both are listable, but
         # in the second case the points that make up the line shouldn't be
         # selected. Just the line.
-        return proxy.TypeName.value.endswith('ModelGroup')
+        return proxy.TypeName.value.endswith("ModelGroup")
 
     @selection.setter
     def selection(self, value):
@@ -167,7 +161,7 @@ class PlxProxyGlobalObject(PlxProxyObject_Abstract):
             self._selection.set(list(value))
         elif isinstance(value, PlxProxyObject):
             self._selection.set([value])
-        elif hasattr(value, '__iter__'):
+        elif hasattr(value, "__iter__"):
             self._selection.set(value)
         elif isinstance(value, Selection):
             # Needed for +/- operators. Effectively a no-op
@@ -195,7 +189,7 @@ class PlxProxyGlobalObject(PlxProxyObject_Abstract):
 
 
 class PlxProxyObject(PlxProxyObject_Abstract):
-    """ A proxy Plaxis object """
+    """A proxy Plaxis object"""
 
     def __init__(self, server, guid, plx_type):
         super(PlxProxyObject, self).__init__(server, guid)
@@ -219,21 +213,21 @@ class PlxProxyObject(PlxProxyObject_Abstract):
         # runtime, unlike IPs.
         try:
             # Access UserFeatures through _attr_cache to prevent infinite recursion of __getattr__
-            userfeatures = self._attr_cache['UserFeatures'].value
+            userfeatures = self._attr_cache["UserFeatures"].value
             for uf in userfeatures:
                 featureTypeName = uf._plx_type
                 if featureTypeName.startswith(STAGED_PREFIX):
-                    featureTypeName = featureTypeName[len(STAGED_PREFIX):]
+                    featureTypeName = featureTypeName[len(STAGED_PREFIX) :]
 
                 if featureTypeName == attr_name:
                     return uf
-        except Exception:  # don't catch BaseException and direct children (e.g. KeyboardInterrupt/SystemExit)
+        # don't catch BaseException and direct children (e.g. KeyboardInterrupt/SystemExit)
+        except Exception:
             pass
 
         # The requested attribute is not an attribute from the HTTP API (nor
         # another attribute of the python object).
-        raise AttributeError(
-            "Requested attribute '{}' is not present".format(attr_name))
+        raise AttributeError("Requested attribute '{}' is not present".format(attr_name))
 
     def __setattr__(self, name, value):
         """
@@ -302,11 +296,11 @@ class PlxProxyListable(object):
         if isinstance(key, slice):
             # The server can process the original slice indices on its own
             return self._server.call_listable_method(
-                self, SUBLIST, startindex=key.start, stopindex=key.stop)
+                self, SUBLIST, startindex=key.start, stopindex=key.stop
+            )
 
         if not isinstance(key, int):
-            raise TypeError("list indices must be integers, not {}".format(
-                key.__class__.__name__))
+            raise TypeError("list indices must be integers, not {}".format(key.__class__.__name__))
 
         if key >= len(self):
             raise IndexError("list index out of range")
@@ -326,9 +320,9 @@ class PlxProxyListable(object):
         length = len(self)
         while cache_start < length:
             cache_end = min(cache_start + PlxProxyListable.ITER_CACHE_COUNT, length)
-            iter_cache = self._server.call_listable_method(self, SUBLIST,
-                                                           startindex=cache_start,
-                                                           stopindex=cache_end)
+            iter_cache = self._server.call_listable_method(
+                self, SUBLIST, startindex=cache_start, stopindex=cache_end
+            )
             cache_start = cache_end
             for element in iter_cache:
                 yield element
@@ -357,7 +351,9 @@ class PlxProxyListable(object):
                 if isinstance(attr, PlxProxyIPStaged):
                     self._attr_cache[attr_name] = PlxStagedIPList(self._server, self, attr_name)
                 else:
-                    self._attr_cache[attr_name] = PlxObjectPropertyList(self._server, self, attr_name)
+                    self._attr_cache[attr_name] = PlxObjectPropertyList(
+                        self._server, self, attr_name
+                    )
 
 
 class PlxProxyValues(PlxProxyListable):
@@ -374,10 +370,10 @@ class PlxProxyValues(PlxProxyListable):
 
 
 class PlxProxyObjectMethod(object):
-    """ A proxy method for a PlxProxyObject """
+    """A proxy method for a PlxProxyObject"""
 
     def __init__(self, server, proxy_object, method_name):
-        """ Create a proxy object method. """
+        """Create a proxy object method."""
         self._server = server
 
         self._proxy_object = proxy_object
@@ -388,8 +384,7 @@ class PlxProxyObjectMethod(object):
         Method call on the target proxy object. The result of this call may
         be an exception, a list of new proxy objects, a boolean or a message.
         """
-        return self._server.call_plx_object_method(
-            self._proxy_object, self._method_name, params)
+        return self._server.call_plx_object_method(self._proxy_object, self._method_name, params)
 
 
 class PlxProxyMaterial(PlxProxyObject):
@@ -409,7 +404,7 @@ class PlxProxyMaterial(PlxProxyObject):
 
 
 class PlxProxyObjectProperty(PlxProxyObject):
-    """ A proxy property for a PlxProxyObject """
+    """A proxy property for a PlxProxyObject"""
 
     def __init__(self, server, guid, plx_type, property_name, owner):
         super(PlxProxyObjectProperty, self).__init__(server, guid, plx_type)
@@ -584,7 +579,7 @@ class PlxProxyIPObject(PlxProxyObjectProperty):
                 # PreviousPhase property of a phase.
                 if isinstance(attr, PlxProxyIPObject):
                     value_props_dict[attr_name] = attr
-                elif '__call__' not in attr.__dict__:
+                elif "__call__" not in attr.__dict__:
                     value_props_dict[attr_name] = attr
 
         return value_props_dict
@@ -604,28 +599,24 @@ class PlxProxyIPObject(PlxProxyObjectProperty):
 
         # Merge the value properties with the intrinsic property
         # every time, since the value may change any time.
-        self._attr_cache = dict(self._ip_attr_cache,
-                                **self._get_value_properties_dict())
+        self._attr_cache = dict(self._ip_attr_cache, **self._get_value_properties_dict())
 
     def __len__(self):
         value = self.value
         if not isinstance(value, PlxProxyListable):
-            raise TypeError("object of type '{}' has no len()".format(
-                type(value)))
+            raise TypeError("object of type '{}' has no len()".format(type(value)))
         return len(value)
 
     def __getitem__(self, index):
         value = self.value
         if not isinstance(value, PlxProxyListable):
-            raise TypeError("'{}' object is not subscriptable".format(
-                type(value)))
+            raise TypeError("'{}' object is not subscriptable".format(type(value)))
         return value[index]
 
     def __iter__(self):
         value = self.value
         if not isinstance(value, PlxProxyListable):
-            raise TypeError("'{}' object is not iterable".format(
-                type(value)))
+            raise TypeError("'{}' object is not iterable".format(type(value)))
         return iter(value)
 
 
@@ -647,8 +638,7 @@ class PlxProxyIPEnumeration(PlxProxyObjectProperty):
     @property
     def enum_dict(self):
         type_dict = type(self).__dict__
-        return {k: type_dict[k] for k in type_dict
-                if not k.startswith('__')}
+        return {k: type_dict[k] for k in type_dict if not k.startswith("__")}
 
     @property
     def strvalue(self):
@@ -665,9 +655,10 @@ class PlxProxyIPEnumeration(PlxProxyObjectProperty):
     def strvalue(self, string):
         enum_dict = self.enum_dict
         if string not in enum_dict:
-            key_names = ', '.join(self.enum_dict.keys())
-            raise ValueError("Invalid enum name '{}', valid values are '{}'".format(
-                string, key_names))
+            key_names = ", ".join(self.enum_dict.keys())
+            raise ValueError(
+                "Invalid enum name '{}', valid values are '{}'".format(string, key_names)
+            )
 
         # Access type descriptor setter directly since assigning to self
         # doesn't work.
@@ -701,18 +692,17 @@ class PlxProxyIPStaged(PlxProxyObjectProperty):
         # by defining __getitem__, the object can be iterated in a for loop with an integer key starting from 0.
         # if no exception is raised, the for loop is infinite. The following check solves this.
         if not isinstance(phase_object, PlxProxyObject):
-            raise TypeError('Expected phase object key')
+            raise TypeError("Expected phase object key")
 
-        return self._server.get_object_property(
-            self._owner, self._property_name, phase_object)
+        return self._server.get_object_property(self._owner, self._property_name, phase_object)
 
     def __setitem__(self, phase_object, value):
-        if value is None:  # cannot set staged to None, as the Plaxis command line doesn't support the concept of None
+        # cannot set staged to None, as the Plaxis command line doesn't support the concept of None
+        if value is None:
             return None
 
         # ProxyObjects that are not ProxyIP need to be de-referenced by its value
         if isinstance(value, PlxProxyObjectProperty) and not isinstance(value, PlxProxyIPStaged):
             value = value.value
 
-        return self._server.set_object_property(
-            self, [phase_object, value])
+        return self._server.set_object_property(self, [phase_object, value])

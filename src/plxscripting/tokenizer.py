@@ -22,10 +22,10 @@ language governing rights and limitations under the PPL.
 from abc import ABC
 from .plx_scripting_exceptions import PlxScriptingTokenizerError
 
-KEY_POSITION = 'position'
-KEY_TYPE = 'type'
-KEY_TOKENS = 'tokens'
-KEY_ERROR_POSITION = 'errorpos'
+KEY_POSITION = "position"
+KEY_TYPE = "type"
+KEY_TOKENS = "tokens"
+KEY_ERROR_POSITION = "errorpos"
 
 
 class TokenBase(ABC):
@@ -38,6 +38,7 @@ class TokenBase(ABC):
     - end_position (indicates the end position of the token in the original string)
     - length (the number of characters the token consumed from the original string)
     """
+
     def __init__(self, raw_data):
         self._raw_data = raw_data
         for key in raw_data:
@@ -50,7 +51,7 @@ class TokenBase(ABC):
             setattr(self, key, value)
 
     def __repr__(self):
-        return '{}.{}({})'.format(self.__module__, self.__class__.__name__, self._raw_data)
+        return "{}.{}({})".format(self.__module__, self.__class__.__name__, self._raw_data)
 
     def __str__(self):
         return str(self.value)
@@ -62,6 +63,7 @@ class TokenBase(ABC):
 
 class TokenIdentifier(TokenBase):
     """Something that will act either as command or as object identifier"""
+
     pass
 
 
@@ -72,6 +74,7 @@ class TokenComment(TokenBase):
     Additional properties:
     - content: the text after the # sign (e.g. running in the case of  #running)
     """
+
     pass
 
 
@@ -85,6 +88,7 @@ class TokenExternalInterpreter(TokenBase):
     - externalcommand: the command to be executed (e.g. echo Points)
     - content: (e.g. output echo Points)
     """
+
     pass
 
 
@@ -95,11 +99,13 @@ class TokenText(TokenBase):
     Additional properties:
     - content: text inside the quotation marks (e.g. input  in the case of "input")
     """
+
     pass
 
 
 class TokenInteger(TokenBase):
     """Identifies a number that can be represented by a 32-bit signed integer"""
+
     def __init__(self, raw_data):
         super().__init__(raw_data)
         self.value = int(self.value)
@@ -107,6 +113,7 @@ class TokenInteger(TokenBase):
 
 class TokenFloat(TokenBase):
     """Identifies a number that can be represented as a floating point value"""
+
     def __init__(self, raw_data):
         super().__init__(raw_data)
         self.value = float(self.value)
@@ -119,46 +126,55 @@ class TokenBracket(TokenBase):
     - brackettype: can be round, square, curly for (), [] respectively {}
     - bracketstate:  can be open or close for {[( respectively )]}
     """
+
     pass
 
 
 class TokenMember(TokenBase):
     """Identifies a bracket type"""
+
     pass
 
 
 class TokenOperand(TokenBase):
     """Identifies an operand type"""
+
     pass
 
 
 class TokenPlus(TokenBase):
     """Identifies the plus operand type"""
+
     pass
 
 
 class TokenMinus(TokenBase):
     """Identifies the minus operand type"""
+
     pass
 
 
 class TokenMultiplier(TokenBase):
     """Identifies the multiplier operand type"""
+
     pass
 
 
 class TokenDivider(TokenBase):
     """Identifies the divider operand type"""
+
     pass
 
 
 class TokenComma(TokenBase):
     """Identifies the comma operand type"""
+
     pass
 
 
 class TokenAssign(TokenBase):
     """Identifies the assign operand type"""
+
     pass
 
 
@@ -169,13 +185,13 @@ def token_factory(token_raw_data):
     :return TokenBase: The token object
     """
     type_to_class_name_mapping = {
-        'externalinterpreter': 'ExternalInterpreter',
+        "externalinterpreter": "ExternalInterpreter",
     }
     token_type = token_raw_data.get(KEY_TYPE)
     class_name = type_to_class_name_mapping.get(token_type)
     if not class_name:
         class_name = token_type.title()
-    token_class = globals()['Token{}'.format(class_name)]
+    token_class = globals()["Token{}".format(class_name)]
     return token_class(token_raw_data)
 
 
@@ -188,14 +204,14 @@ class TokenizerResultHandler(object):
         self.partial_tokens = []
         for key in response:
             if key != KEY_TOKENS:
-                attribute_name = key if key != KEY_ERROR_POSITION else 'error_position'
+                attribute_name = key if key != KEY_ERROR_POSITION else "error_position"
                 setattr(self, attribute_name, response[key])
             else:
                 for token in response.get(KEY_TOKENS):
                     self.partial_tokens.append(token_factory(token))
         if not self.success:
             self.error_position -= 1
-            self.error = 'Unrecognized token at position {}'.format(self.error_position)
+            self.error = "Unrecognized token at position {}".format(self.error_position)
 
     @property
     def tokens(self):
