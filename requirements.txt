@@ -74,7 +74,7 @@ ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.2
     # via stack-data
-pycryptodome==3.19.0
+pycryptodome==3.19.1
     # via plxscripting (pyproject.toml)
 pygments==2.16.1
     # via ipython
