@@ -22,17 +22,15 @@ $ pip install plxscripting==1.0.2
 # Compatibility tables between Plaxis program version and repo version
 
 Each version of this repository is compatible with one (or more) versions of 
-the PLAXIS 2D and 3D programs. Below you find two tables containing the 
+the PLAXIS 2D and 3D programs. Below you find the table containing the 
 known compatibilities, so you can install the version you need depending on
 the PLAXIS program you need to use.
 
-|           PLAXIS 2D Versions           | Repository Version |
-| :------------------------------------: | :----------------: |
-| PLAXIS 2D CONNECT Edition V22 Update 2 |       1.0.2        |
+| Repository Version |            PLAXIS Versions             |
+| :----------------: | :------------------------------------: |
+|    1.0.2           | PLAXIS 2D CONNECT Edition V22 Update 2 |
+|    1.0.4           | PLAXIS 2D 2023.2 , PLAXIS 3D 2023.2    | 
 
-| PLAXIS 3D Versions | Repository Version |
-| :----------------: | :----------------: |
-|  PLAXIS 3D 2023.2  |       1.0.4        |
 
 # Contribution
 
@@ -50,7 +48,7 @@ where `Seequent` used to be named `Bentley` in the previous versions and `V2`
 will have a different index.
 
 The contribution of this repository restricts itself to:
--   Copy the copy these files to `plxscripting` directory and the `encryption.py` under
+-   Copy these files to the `plxscripting` directory and the `encryption.py` under
     the `src` of this repository.
 - Make a new release using the same version as in the file `plxscripting\__version__.py`.
 - Updating the compatibilty tables writter in the previous section.
