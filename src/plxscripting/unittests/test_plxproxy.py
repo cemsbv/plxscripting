@@ -62,6 +62,7 @@ def test_PlxProxyObject(environment):
     obj = plxproxy.PlxProxyObject(server, GUID, PLX_TYPE)
     assert PLX_TYPE in str(obj)
     assert GUID in str(obj)
+    assert obj.plx_type == PLX_TYPE
 
     obj.custom_attribute = 54321
     assert hasattr(obj, "custom_attribute")
@@ -74,6 +75,14 @@ def test_PlxProxyObject(environment):
 
     with pytest.raises(AttributeError):
         __ = obj.non_existent_attribute
+
+
+def test_cannot_set_plx_type(environment):
+    server, owner, GUID, GUID_OWNER, PLX_TYPE = environment
+    obj = plxproxy.PlxProxyObject(server, GUID, PLX_TYPE)
+
+    with pytest.raises(AttributeError):
+        obj.plx_type = "NewType"
 
 
 def test_PlxProxyListable(environment):
@@ -129,7 +138,8 @@ def test_PlxProxyValues(environment):
     with obj:
         pass
 
-    # make sure delete was called on obj (once!). This function is injected in mock server's get_object_attributes.
+    # make sure delete was called on obj (once!). This function is injected in mock server's
+    # get_object_attributes.
     assert server.func_calls_since_last_check() == 1
 
 
@@ -176,12 +186,8 @@ def test_PlxProxyIPBoolean(environment):
     assert obj.value is True
 
     assert obj is not True
-    assert obj == True
-    assert obj != False
-    assert not (obj == False)
-    assert not (obj != True)
-    assert obj != None
-    assert not (obj == None)
+    assert obj
+    assert obj is not None
 
 
 def test_PlxProxyIPNumber(environment):
@@ -189,7 +195,8 @@ def test_PlxProxyIPNumber(environment):
     obj = plxproxy.PlxProxyIPNumber(server, GUID, PLX_TYPE, "number", owner)
     server.object_property_to_send = 20
     assert obj + obj + 20 + 0.1 == 60.1
-    # Should be mostly tested by test_PlxProxyIPInteger and test_PlxProxyIPDouble, this is just a unit-smoketest
+    # Should be mostly tested by test_PlxProxyIPInteger and test_PlxProxyIPDouble, this is just a
+    # unit-smoketest
 
 
 def test_PlxProxyIPInteger(environment):

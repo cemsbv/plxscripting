@@ -62,7 +62,7 @@ class PlxProxyObject_Abstract(object):
         """
         Return all attributes of the object (both from Plaxis and locally)
         """
-        return dir(super(PlxProxyObject_Abstract, self)) + list(self.attr_cache)
+        return list(super().__dir__()) + list(self.attr_cache)
 
     def get_equivalent(self, object=None):
         if object is None:
@@ -71,9 +71,9 @@ class PlxProxyObject_Abstract(object):
         try:
             object_name = self._server.get_name_by_guid(object._guid)
         except KeyError:
-            # Materials in output have different GUID's mostly because new materials are created to support
-            # design approaches on different phases. We need to grab the real name of the object when getting the
-            # equivalent object
+            # Materials in output have different GUID's mostly because new materials are created to
+            # support design approaches on different phases. We need to grab the real name of the
+            # object when getting the equivalent object
             object_name = object.Name.value
         try:
             return self._server.get_named_object(object_name)
@@ -270,6 +270,10 @@ class PlxProxyObject(PlxProxyObject_Abstract):
         if not self._attr_cache:
             self._attr_cache = self._server.get_object_attributes(self)
 
+    @property
+    def plx_type(self):
+        return self._plx_type
+
 
 class PlxProxyListable(object):
     """
@@ -411,7 +415,8 @@ class PlxProxyObjectProperty(PlxProxyObject):
 
         self._owner = owner
         self._property_name = property_name
-        # If the proxy property is a staged intr. prop., the primitive is stored in the _stagedIP_value.
+        # If the proxy property is a staged intr. prop., the primitive is stored in the
+        # _stagedIP_value.
         self._stagedIP_value = None
 
     def set_stagedIP_value(self, value):
@@ -572,7 +577,7 @@ class PlxProxyIPObject(PlxProxyObjectProperty):
             # Avoid adding attributes of the value that clash
             # with those of the intrinsic property, and the
             # methods.
-            if not attr_name in dir(super(PlxProxyObject, self)):
+            if attr_name not in dir(super(PlxProxyObject, self)):
                 # Don't use hasattr on a PlxProxyIPObject referred by this one,
                 # since calling hasattr will use __getattr__, potentially creating
                 # an imense amount of recusion. This is especially true for the
@@ -689,8 +694,9 @@ class PlxProxyIPStaged(PlxProxyObjectProperty):
     """
 
     def __getitem__(self, phase_object):
-        # by defining __getitem__, the object can be iterated in a for loop with an integer key starting from 0.
-        # if no exception is raised, the for loop is infinite. The following check solves this.
+        # by defining __getitem__, the object can be iterated in a for loop with an integer key
+        # starting from 0. if no exception is raised, the for loop is infinite. The following
+        # check solves this.
         if not isinstance(phase_object, PlxProxyObject):
             raise TypeError("Expected phase object key")
 

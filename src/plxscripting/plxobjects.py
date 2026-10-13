@@ -162,8 +162,8 @@ class PlxObjectPropertyList:
             plx_objects_in_list, self._property_name, self._phase_object
         )
 
-        # For staged IPs, the returned object is a staged IP proxy object and not the value directly,
-        # so we query the value here
+        # For staged IPs, the returned object is a staged IP proxy object and not the value
+        # directly, so we query the value here
         if self._phase_object is not None:
             return [p.value for p in properties]
         else:
@@ -182,8 +182,9 @@ class PlxStagedIPList:
         self._property_name = property_name
 
     def __getitem__(self, phase_object):
-        # by defining __getitem__, the object can be iterated in a for loop with an integer key starting from 0.
-        # if no exception is raised, the for loop is infinite. The following check solves this.
+        # by defining __getitem__, the object can be iterated in a for loop with an integer key
+        # starting from 0. if no exception is raised, the for loop is infinite. The following
+        # check solves this.
         if not isinstance(phase_object, plxproxy.PlxProxyObject):
             raise TypeError("Expected phase object key")
 

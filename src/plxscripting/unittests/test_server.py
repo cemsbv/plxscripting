@@ -544,13 +544,13 @@ def test_Server_call_commands():
     con, srv = newsrv()
 
     resp = srv.call_commands("Command 1", "Command 2")
-    assert resp[0]["feedback"]["success"] == True
+    assert resp[0]["feedback"]["success"] is True
     assert resp[0]["feedback"]["extrainfo"] == "Reply_to_command: Command 1"
     assert resp[1]["feedback"]["extrainfo"] == "Reply_to_command: Command 2"
 
     con.test_success = False
     resp = srv.call_commands("gotomesh")
-    assert resp[0]["feedback"]["success"] == False
+    assert resp[0]["feedback"]["success"] is False
     assert (
         resp[0]["feedback"]["extrainfo"]
         == "Cannot intersect unless there is at least one volume or surface in the geometry"
@@ -637,7 +637,7 @@ def test_Server_tokenize():
     resp = srv.tokenize('plaxis_command object_name "string_arg" 1 2 "string_arg2"')
     assert isinstance(resp, tokenizer.TokenizerResultHandler)
     assert resp.extrainfo == ""
-    assert resp.success == True
+    assert resp.success is True
     assert isinstance(resp.tokens[0], tokenizer.TokenIdentifier)
     assert resp.tokens[0].value == "command"
     assert resp.tokens[0].position == 0
@@ -659,7 +659,7 @@ def test_Server_tokenize():
     resp = srv.tokenize('1234 "bla bla 542 2')
     assert isinstance(resp, tokenizer.TokenizerResultHandler)
     assert resp.extrainfo == "Unbalanced quotes"
-    assert resp.success == False
+    assert resp.success is False
     with pytest.raises(PlxScriptingTokenizerError) as exc:
         resp.tokens[0]
     assert str(exc.value) == "Unrecognized token at position 5"

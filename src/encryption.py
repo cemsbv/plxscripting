@@ -27,17 +27,14 @@
         - a JSON object
 
 
-  Subversion data:
-    $Id: encryption.py 11612 2013-04-02 14:17:47Z ac $
-    $URL: https://tools.plaxis.com/svn/sharelib/trunk/PlxObjectLayer/Server/RemoteLicenceServer/rsauth/encryption.py $
-
   Copyright (c) Plaxis BV. All rights reserved.
 
 """
 
 from Crypto.Cipher import Blowfish
+
 # Adjusting Blowfish key size minimum value so it can be compatible with Delphi implementation that allows smaller keys
-Blowfish.key_size = range(1, 56+1)
+Blowfish.key_size = range(1, 56 + 1)
 from Crypto import Random
 import base64
 import json
@@ -45,17 +42,18 @@ import uuid
 import string
 
 # request parameters
-REQUEST_DATA = 'RequestData'
-CODE = 'Code'
+REQUEST_DATA = "RequestData"
+CODE = "Code"
 
 # JSON fields
-REPLY_CODE = 'ReplyCode'
-RESPONSE = 'Response'
+REPLY_CODE = "ReplyCode"
+RESPONSE = "Response"
 
 blocksize = Blowfish.block_size
 
+
 def make_cipher(key, initialization_vector):
-    """"The PyCrypto docs state about encryption modes:
+    """The PyCrypto docs state about encryption modes:
         The simplest is Electronic Code Book (or ECB) mode.
         In this mode, each block of plaintext is simply
         encrypted to produce the ciphertext. This mode can
@@ -76,9 +74,9 @@ def make_cipher(key, initialization_vector):
     For this reason we will use CBC.
 
     """
-    if len(initialization_vector) != blocksize: # prevent crashing in case of malicious init vector
+    if len(initialization_vector) != blocksize:  # prevent crashing in case of malicious init vector
         initialization_vector = bytearray(blocksize)
-    return Blowfish.new(key.encode('utf-8'), Blowfish.MODE_CBC, initialization_vector)
+    return Blowfish.new(key.encode("utf-8"), Blowfish.MODE_CBC, initialization_vector)
 
 
 def encrypt(datastring, key):
@@ -98,11 +96,12 @@ def encrypt(datastring, key):
     if datastring.endswith(tuple(string.whitespace)):
         raise Exception("String ending in whitespace can't be encrypted correctly.")
 
-    data = datastring.encode('utf-8') # ensure that the encrypted data comes after decryption in a predictable encoding (utf-8)
+    # ensure that the encrypted data comes after decryption in a predictable encoding (utf-8)
+    data = datastring.encode("utf-8")
     padding_length = blocksize - len(data) % blocksize
-    padding = b' ' * padding_length
+    padding = b" " * padding_length
     encrypted_data = cipher.encrypt(data + padding)
-    return (base64.b64encode(encrypted_data).decode('ascii'), base64.b64encode(iv).decode('ascii'))
+    return (base64.b64encode(encrypted_data).decode("ascii"), base64.b64encode(iv).decode("ascii"))
 
 
 def base64decode_safe(encoded_string):
@@ -114,29 +113,29 @@ def base64decode_safe(encoded_string):
     try:
         return base64.b64decode(encoded_string)
     except:
-        return ''
+        return ""
 
 
 def decrypt(encrypted_data, initialization_vector, key):
     """The data and init vector must be base64 encoded!"""
     cipher = make_cipher(key, base64decode_safe(initialization_vector))
-    try: # encrypted data comes from untrusted source and may be corrupted
+    try:  # encrypted data comes from untrusted source and may be corrupted
         res = cipher.decrypt(base64decode_safe(encrypted_data))
-        res = res.decode('utf-8')
+        res = res.decode("utf-8")
         return res.rstrip()
     except:
-        return ''
+        return ""
 
 
-ERR_INVALID_CONTENT_FOR = 'Invalid content for %s'
-ERR_MISSING_ITEM = 'Missing: %s'
-ERR_BAD_REPLY_CODE = 'Bad reply code'
-ERR_INVALID_RESPONSE_DATA_JSON = 'Invalid response data JSON'
-ERR_NO_EXPECTED_REPLY_CODE_DEFINED = 'No expected reply code defined'
+ERR_INVALID_CONTENT_FOR = "Invalid content for %s"
+ERR_MISSING_ITEM = "Missing: %s"
+ERR_BAD_REPLY_CODE = "Bad reply code"
+ERR_INVALID_RESPONSE_DATA_JSON = "Invalid response data JSON"
+ERR_NO_EXPECTED_REPLY_CODE_DEFINED = "No expected reply code defined"
 
 
-class EncryptionHandler():
-    """ An object capable of handling requests, with transparent
+class EncryptionHandler:
+    """An object capable of handling requests, with transparent
     encryption/decryption facilities.
 
     It can be used as:
@@ -154,14 +153,15 @@ class EncryptionHandler():
     is disabled.
 
     """
+
     def __init__(self, key):
         """If the key is not specified, no encryption/decryption will
         be performed.
 
         """
-        self.key = key # used for encrypting/decrypting
+        self.key = key  # used for encrypting/decrypting
         self.data = {}
-        self.reply_code = ''
+        self.reply_code = ""
 
 
 class EncryptionHandlerServer(EncryptionHandler):
@@ -169,6 +169,7 @@ class EncryptionHandlerServer(EncryptionHandler):
     encrypt an outgoing response.
 
     """
+
     def interpret_request(self, code, request_data):
         """Interprets the request data using the current key and the
         specified code (initialization vector).
@@ -180,7 +181,7 @@ class EncryptionHandlerServer(EncryptionHandler):
         Sets internally the reply_code for later use (if applicable).
 
         """
-        if self.key: # otherwise treat as unencrypted data
+        if self.key:  # otherwise treat as unencrypted data
             decrypted_data = decrypt(request_data, code, self.key)
         else:
             decrypted_data = request_data
@@ -191,19 +192,18 @@ class EncryptionHandlerServer(EncryptionHandler):
         except:
             return (False, ERR_INVALID_CONTENT_FOR % (REQUEST_DATA))
 
-
         # encrypted communications are supposed to have a reply code so the
         # caller can verify that the callee actually decrypted the message
         # (the callee must include the reply code in its encrypted response)
         if self.key:
             try:
                 self.reply_code = self.data[REPLY_CODE]
-                del self.data[REPLY_CODE] # is infrastructure stuff, don't expose to the caller
+                del self.data[REPLY_CODE]  # is infrastructure stuff, don't expose to the caller
             except:
                 self.data = {}
                 return (False, ERR_MISSING_ITEM % (REPLY_CODE))
 
-        return (True, '')
+        return (True, "")
 
     def build_response(self, response_dict):
         if self.key:
@@ -223,6 +223,7 @@ class EncryptionHandlerClient(EncryptionHandler):
     decrypt the incoming response.
 
     """
+
     def build_request_dict(self, request_parameters):
         """Builds an (encrypted) request dictionary, including a
         reply code. The reply code is remembered for checking
@@ -231,16 +232,15 @@ class EncryptionHandlerClient(EncryptionHandler):
         """
         if self.key:
             if REPLY_CODE not in request_parameters:
-                self.reply_code = '{%s}' % (str(uuid.uuid4()).upper())
+                self.reply_code = "{%s}" % (str(uuid.uuid4()).upper())
                 request_parameters[REPLY_CODE] = self.reply_code
             else:
                 self.reply_code = request_parameters[REPLY_CODE]
             encrypted_data, code = encrypt(json.dumps(request_parameters), self.key)
             return {REQUEST_DATA: encrypted_data, CODE: code}
         else:
-            self.reply_code = ''
+            self.reply_code = ""
             return {REQUEST_DATA: json.dumps(request_parameters)}
-
 
     def interpret_response(self, response_data):
         """Interprets the response data using the current key.
@@ -283,15 +283,12 @@ class EncryptionHandlerClient(EncryptionHandler):
                 return (False, ERR_MISSING_ITEM % (REPLY_CODE))
             if response_dict[REPLY_CODE] != self.reply_code:
                 return (False, ERR_BAD_REPLY_CODE)
-            del response_dict[REPLY_CODE] # is infrastructure stuff, don't expose to the caller
-        else: # not encrypted
+            del response_dict[REPLY_CODE]  # is infrastructure stuff, don't expose to the caller
+        else:  # not encrypted
             response_dict = container_response_dict
 
         self.data = response_dict
-        return (True, '')
-
-
-
+        return (True, "")
 
 
 ##s = u'概要hello world'

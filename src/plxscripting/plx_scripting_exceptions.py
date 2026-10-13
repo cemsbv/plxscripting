@@ -36,7 +36,8 @@ class PlxScriptingLocalError(Exception):
 
 
 class PlxScriptingPreconditionError(Exception):
-    """Base class for exceptions raised when there was an error on server-side before the request was made"""
+    """Base class for exceptions raised when there was an error on server-side before the request
+    was made"""
 
 
 class PlxScriptingTokenizerError(Exception):

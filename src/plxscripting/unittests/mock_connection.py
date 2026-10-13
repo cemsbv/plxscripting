@@ -29,7 +29,7 @@ free disk space    : (C:) 0 GB (D:) 0 GB
 executable         : PlaxisXDXput.exe
 version            : 20xx.x.0.0
 exception class    : Exception
-exception message  : Mock exception 
+exception message  : Mock exception
 
 thread $0000: <priority:-1>
 ffffffff +ff PlaxisXDXput.exe                 1697 +1 TPTProcedureRunner.Execute
@@ -80,44 +80,40 @@ class HTTPConnection:
 
         for command in commands:
             if self.test_success:
-                reply["commands"].append(
-                    {
-                        "feedback": {
-                            "extrainfo": "Reply_to_command: {}".format(command),
-                            "returnedobjects": (
-                                [
-                                    {
-                                        "islistable": False,
-                                        "guid": self._next_guid,
-                                        "type": "Mock_reply_object_{}".format(self._guid_counter),
-                                    }
-                                ]
-                                if HTTPConnection.MAGIC_REQUEST_OBJECT in command
-                                else []
-                            ),
-                            "debuginfo": "",
-                            "success": True,
-                            "errorpos": -1,
-                            "returnedvalues": [],
-                        },
-                        "command": command,
-                    }
-                )
+                reply["commands"].append({
+                    "feedback": {
+                        "extrainfo": "Reply_to_command: {}".format(command),
+                        "returnedobjects": (
+                            [
+                                {
+                                    "islistable": False,
+                                    "guid": self._next_guid,
+                                    "type": "Mock_reply_object_{}".format(self._guid_counter),
+                                }
+                            ]
+                            if HTTPConnection.MAGIC_REQUEST_OBJECT in command
+                            else []
+                        ),
+                        "debuginfo": "",
+                        "success": True,
+                        "errorpos": -1,
+                        "returnedvalues": [],
+                    },
+                    "command": command,
+                })
             else:
-                reply["commands"].append(
-                    {
-                        "feedback": {
-                            "extrainfo": (
-                                "Cannot intersect unless there is at least one volume or surface in"
-                                " the geometry"
-                            ),
-                            "debuginfo": "",
-                            "success": False,
-                            "errorpos": -1,
-                        },
-                        "command": command,  # 'gotomesh'
-                    }
-                )
+                reply["commands"].append({
+                    "feedback": {
+                        "extrainfo": (
+                            "Cannot intersect unless there is at least one volume or surface in"
+                            " the geometry"
+                        ),
+                        "debuginfo": "",
+                        "success": False,
+                        "errorpos": -1,
+                    },
+                    "command": command,  # 'gotomesh'
+                })
 
         return reply
 
@@ -125,67 +121,65 @@ class HTTPConnection:
         reply = {"queries": {}, "ReplyCode": "0" * 32}
 
         for guid in guids:
-            reply["queries"].update(
-                {
-                    guid: {
-                        "extrainfo": "",
-                        "success": True,
-                        "properties": {
-                            "Mock_number": {
-                                "islistable": False,
-                                "value": 42,
-                                "type": "Number",
-                                "guid": self._next_guid,
-                                "ispublished": True,
-                                "ownerguid": guid,
-                                "caption": "Mock_number#",
-                            },
-                            "TypeName": {
-                                "islistable": False,
-                                "value": "MockItem",
-                                "type": "Text",
-                                "guid": self._next_guid,
-                                "ispublished": False,
-                                "ownerguid": guid,
-                                "caption": "TypeName",
-                            },
-                            "IsDynamicComponent": {
-                                "islistable": False,
-                                "value": False,
-                                "type": "Boolean",
-                                "guid": self._next_guid,
-                                "ispublished": False,
-                                "ownerguid": guid,
-                                "caption": "IsDynamicComponent",
-                            },
-                            "Name": {
-                                "islistable": False,
-                                "value": "MockItem_Name_memb",
-                                "type": "Text",
-                                "guid": self._next_guid,
-                                "ispublished": False,
-                                "ownerguid": guid,
-                                "caption": "Name",
-                            },
-                            "UserFeatures": {
-                                "islistable": False,
-                                "value": {
-                                    "islistable": True,
-                                    "type": "PlxUserFeatureList",
-                                    "guid": self._next_guid,
-                                },
-                                "type": "Object",
-                                "guid": self._next_guid,
-                                "ispublished": False,
-                                "ownerguid": guid,
-                                "caption": "UserFeatures",
-                            },
+            reply["queries"].update({
+                guid: {
+                    "extrainfo": "",
+                    "success": True,
+                    "properties": {
+                        "Mock_number": {
+                            "islistable": False,
+                            "value": 42,
+                            "type": "Number",
+                            "guid": self._next_guid,
+                            "ispublished": True,
+                            "ownerguid": guid,
+                            "caption": "Mock_number#",
                         },
-                        "commands": ["echo"],
-                        "commandlinename": "LineLoad_1",
-                    }
+                        "TypeName": {
+                            "islistable": False,
+                            "value": "MockItem",
+                            "type": "Text",
+                            "guid": self._next_guid,
+                            "ispublished": False,
+                            "ownerguid": guid,
+                            "caption": "TypeName",
+                        },
+                        "IsDynamicComponent": {
+                            "islistable": False,
+                            "value": False,
+                            "type": "Boolean",
+                            "guid": self._next_guid,
+                            "ispublished": False,
+                            "ownerguid": guid,
+                            "caption": "IsDynamicComponent",
+                        },
+                        "Name": {
+                            "islistable": False,
+                            "value": "MockItem_Name_memb",
+                            "type": "Text",
+                            "guid": self._next_guid,
+                            "ispublished": False,
+                            "ownerguid": guid,
+                            "caption": "Name",
+                        },
+                        "UserFeatures": {
+                            "islistable": False,
+                            "value": {
+                                "islistable": True,
+                                "type": "PlxUserFeatureList",
+                                "guid": self._next_guid,
+                            },
+                            "type": "Object",
+                            "guid": self._next_guid,
+                            "ispublished": False,
+                            "ownerguid": guid,
+                            "caption": "UserFeatures",
+                        },
+                    },
+                    "commands": ["echo"],
+                    "commandlinename": "LineLoad_1",
                 }
-            )
+            })
         return reply
 
     def request_namedobjects(self, *object_names):
@@ -214,25 +208,25 @@ class HTTPConnection:
 
         if property_name == "Name":
             for i, owner_guid in enumerate(owner_guids):
-                reply["queries"][i][owner_guid].update(
-                    {"extrainfo": "", "success": True, "properties": {"Name": "MockItem_Name_pval"}}
-                )
+                reply["queries"][i][owner_guid].update({
+                    "extrainfo": "",
+                    "success": True,
+                    "properties": {"Name": "MockItem_Name_pval"},
+                })
 
         elif property_name == "UserFeatures":
             for i, owner_guid in enumerate(owner_guids):
-                reply["queries"][i][owner_guid].update(
-                    {
-                        "extrainfo": "",
-                        "success": True,
-                        "properties": {
-                            "UserFeatures": {
-                                "islistable": False,
-                                "type": "MockItem_{}".format(self._guid_counter),
-                                "guid": self._next_guid,
-                            }
-                        },
-                    }
-                )
+                reply["queries"][i][owner_guid].update({
+                    "extrainfo": "",
+                    "success": True,
+                    "properties": {
+                        "UserFeatures": {
+                            "islistable": False,
+                            "type": "MockItem_{}".format(self._guid_counter),
+                            "guid": self._next_guid,
+                        }
+                    },
+                })
         else:
             raise Exception('property_name "{}" not supported'.format(property_name))
 
@@ -247,42 +241,36 @@ class HTTPConnection:
 
         for query in list_queries:
             if query["method"] == "count":
-                reply["listqueries"].append(
-                    {
-                        "extrainfo": "",
-                        "success": True,
-                        "methodname": "count",
-                        "guid": query["guid"],
-                        "outputdata": 3,
-                    }
-                )
+                reply["listqueries"].append({
+                    "extrainfo": "",
+                    "success": True,
+                    "methodname": "count",
+                    "guid": query["guid"],
+                    "outputdata": 3,
+                })
             elif query["method"] == "index":
-                reply["listqueries"].append(
-                    {
-                        "extrainfo": "",
-                        "success": True,
-                        "startindex": query["startindex"],
-                        "methodname": "index",
-                        "guid": query["guid"],
-                        "outputdata": {
-                            "islistable": False,  # Let's not nest lists...
-                            "type": "MockItem_{}".format(self._guid_counter),
-                            "guid": self._next_guid,
-                        },
-                    }
-                )
+                reply["listqueries"].append({
+                    "extrainfo": "",
+                    "success": True,
+                    "startindex": query["startindex"],
+                    "methodname": "index",
+                    "guid": query["guid"],
+                    "outputdata": {
+                        "islistable": False,  # Let's not nest lists...
+                        "type": "MockItem_{}".format(self._guid_counter),
+                        "guid": self._next_guid,
+                    },
+                })
             elif query["method"] == "memberindex":
-                reply["listqueries"].append(
-                    {
-                        "extrainfo": "",
-                        "success": True,
-                        "startindex": query["startindex"],
-                        "methodname": "index",
-                        "membernames": query["membernames"],
-                        "guid": query["guid"],
-                        "outputdata": {},  # will be filled in the for loop below
-                    }
-                )
+                reply["listqueries"].append({
+                    "extrainfo": "",
+                    "success": True,
+                    "startindex": query["startindex"],
+                    "methodname": "index",
+                    "membernames": query["membernames"],
+                    "guid": query["guid"],
+                    "outputdata": {},  # will be filled in the for loop below
+                })
 
                 for member_name in query["membernames"]:
                     reply["listqueries"][-1]["outputdata"][member_name] = {
@@ -292,51 +280,43 @@ class HTTPConnection:
                         "ownerguid": self._next_guid,
                     }
             elif query["method"] == "sublist":
-                reply["listqueries"].append(
-                    {
-                        "extrainfo": "",
-                        "stopindex": query["stopindex"],
-                        "success": True,
-                        "startindex": query["startindex"],
-                        "methodname": "sublist",
-                        "guid": query["guid"],
-                        "outputdata": [],  # will be filled in the for loop below
-                    }
-                )
+                reply["listqueries"].append({
+                    "extrainfo": "",
+                    "stopindex": query["stopindex"],
+                    "success": True,
+                    "startindex": query["startindex"],
+                    "methodname": "sublist",
+                    "guid": query["guid"],
+                    "outputdata": [],  # will be filled in the for loop below
+                })
 
                 for x in range(int(query["stopindex"]) - int(query["startindex"])):
-                    reply["listqueries"][-1]["outputdata"].append(
-                        {
-                            "islistable": False,  # Let's not nest lists...
-                            "type": "MockItem_{}".format(self._guid_counter),
-                            "guid": self._next_guid,
-                        }
-                    )
+                    reply["listqueries"][-1]["outputdata"].append({
+                        "islistable": False,  # Let's not nest lists...
+                        "type": "MockItem_{}".format(self._guid_counter),
+                        "guid": self._next_guid,
+                    })
             elif query["method"] == "membersublist":
-                reply["listqueries"].append(
-                    {
-                        "extrainfo": "",
-                        "stopindex": query["stopindex"],
-                        "success": True,
-                        "startindex": query["startindex"],
-                        "membernames": query["membernames"],
-                        "methodname": "membersublist",
-                        "guid": query["guid"],
-                        "outputdata": {},  # will be filled in the for loop below
-                    }
-                )
+                reply["listqueries"].append({
+                    "extrainfo": "",
+                    "stopindex": query["stopindex"],
+                    "success": True,
+                    "startindex": query["startindex"],
+                    "membernames": query["membernames"],
+                    "methodname": "membersublist",
+                    "guid": query["guid"],
+                    "outputdata": {},  # will be filled in the for loop below
+                })
 
                 for member_name in query["membernames"]:
                     reply["listqueries"][-1]["outputdata"][member_name] = []
                     for x in range(int(query["stopindex"]) - int(query["startindex"])):
-                        reply["listqueries"][-1]["outputdata"][member_name].append(
-                            {
-                                "islistable": False,  # Let's not nest lists...
-                                "type": "MockNumber",
-                                "guid": self._next_guid,
-                                "ownerguid": self._next_guid,
-                            }
-                        )
+                        reply["listqueries"][-1]["outputdata"][member_name].append({
+                            "islistable": False,  # Let's not nest lists...
+                            "type": "MockNumber",
+                            "guid": self._next_guid,
+                            "ownerguid": self._next_guid,
+                        })
 
             else:
                 raise Exception(f"Unsupported method: {query['method']}")
@@ -362,14 +342,18 @@ class HTTPConnection:
         elif command == "set":
             self._selection = []
             for guid in guids:
-                self._selection.append(
-                    {"islistable": False, "type": "MockItem_Selection", "guid": guid}
-                )
+                self._selection.append({
+                    "islistable": False,
+                    "type": "MockItem_Selection",
+                    "guid": guid,
+                })
         elif command == "append":
             for guid in guids:
-                self._selection.append(
-                    {"islistable": False, "type": "MockItem_Selection", "guid": guid}
-                )
+                self._selection.append({
+                    "islistable": False,
+                    "type": "MockItem_Selection",
+                    "guid": guid,
+                })
         elif command == "remove":
             newselection = []
             for selecteditem in self._selection:
@@ -399,71 +383,63 @@ class HTTPConnection:
         for command in commands:
             if self.test_success:
                 if self.test_tokenize_external:
-                    reply["tokenize"].append(
-                        {
-                            "extrainfo": "",
-                            "tokenize": command,  # '/command object "param" "param2" 2 3 4'
-                            "tokens": [
-                                {
-                                    "interpretername": "command",
-                                    "position": 1,
-                                    "externalcommand": 'object "param" "param2" 2 3 4',
-                                    "length": 38,
-                                    "value": '/command object "param" "param2" 2 3 4',
-                                    "content": '/command object "param" "param2" 2 3 4',
-                                    "type": "externalinterpreter",
-                                }
-                            ],
-                            "success": True,
-                            "errorpos": -1,
-                        }
-                    )
-                else:
-                    reply["tokenize"].append(
-                        {
-                            "extrainfo": "",
-                            "tokenize": command,  # 'command object "param" "param2" 2 3 4'
-                            "tokens": [
-                                {
-                                    "position": 1,
-                                    "length": 7,
-                                    "value": "command",
-                                    "type": "identifier",
-                                },
-                                {"position": 9, "length": 6, "value": "object", "type": "operand"},
-                                {
-                                    "position": 16,
-                                    "length": 7,
-                                    "value": '"param"',
-                                    "content": "param",
-                                    "type": "text",
-                                },
-                                {
-                                    "position": 24,
-                                    "length": 8,
-                                    "value": '"param2"',
-                                    "content": "param2",
-                                    "type": "text",
-                                },
-                                {"position": 33, "length": 1, "value": "2", "type": "integer"},
-                                {"position": 35, "length": 1, "value": "3", "type": "integer"},
-                                {"position": 37, "length": 1, "value": "4", "type": "integer"},
-                            ],
-                            "success": True,
-                            "errorpos": -1,
-                        }
-                    )
-            else:
-                reply["tokenize"].append(
-                    {
-                        "extrainfo": "Unbalanced quotes",
-                        "tokenize": command,  # '1234 "bla bla 542 2'
+                    reply["tokenize"].append({
+                        "extrainfo": "",
+                        "tokenize": command,  # '/command object "param" "param2" 2 3 4'
                         "tokens": [
-                            {"position": 1, "length": 4, "value": "1234", "type": "integer"}
+                            {
+                                "interpretername": "command",
+                                "position": 1,
+                                "externalcommand": 'object "param" "param2" 2 3 4',
+                                "length": 38,
+                                "value": '/command object "param" "param2" 2 3 4',
+                                "content": '/command object "param" "param2" 2 3 4',
+                                "type": "externalinterpreter",
+                            }
                         ],
-                        "success": False,
-                        "errorpos": 6,
-                    }
-                )
+                        "success": True,
+                        "errorpos": -1,
+                    })
+                else:
+                    reply["tokenize"].append({
+                        "extrainfo": "",
+                        "tokenize": command,  # 'command object "param" "param2" 2 3 4'
+                        "tokens": [
+                            {
+                                "position": 1,
+                                "length": 7,
+                                "value": "command",
+                                "type": "identifier",
+                            },
+                            {"position": 9, "length": 6, "value": "object", "type": "operand"},
+                            {
+                                "position": 16,
+                                "length": 7,
+                                "value": '"param"',
+                                "content": "param",
+                                "type": "text",
+                            },
+                            {
+                                "position": 24,
+                                "length": 8,
+                                "value": '"param2"',
+                                "content": "param2",
+                                "type": "text",
+                            },
+                            {"position": 33, "length": 1, "value": "2", "type": "integer"},
+                            {"position": 35, "length": 1, "value": "3", "type": "integer"},
+                            {"position": 37, "length": 1, "value": "4", "type": "integer"},
+                        ],
+                        "success": True,
+                        "errorpos": -1,
+                    })
+            else:
+                reply["tokenize"].append({
+                    "extrainfo": "Unbalanced quotes",
+                    "tokenize": command,  # '1234 "bla bla 542 2'
+                    "tokens": [{"position": 1, "length": 4, "value": "1234", "type": "integer"}],
+                    "success": False,
+                    "errorpos": 6,
+                })
 
         return reply

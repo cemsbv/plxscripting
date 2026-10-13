@@ -1,6 +1,6 @@
 """
-Purpose: PlaxisConnector provides methods to start PLAXIS 2D or PLAXIS 3D and make the plxscripting server
-ready to be used
+Purpose: PlaxisConnector provides methods to start PLAXIS 2D or PLAXIS 3D and make the plxscripting
+server ready to be used
 
 Copyright (c) Plaxis bv. All rights reserved.
 
@@ -20,10 +20,9 @@ language governing rights and limitations under the PPL.
 
 import os
 import socket
-import string
-import random
 import time
 import psutil
+import secrets
 import winreg as wr
 from contextlib import closing
 import subprocess as sp
@@ -64,7 +63,7 @@ def generate_random_key(length=20):
     :param int length: The length of the string to generate
     :return string: A random generated string
     """
-    return "".join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
+    return secrets.token_urlsafe(length)
 
 
 def _retrieve_registry_path(plaxis_reg_path):
@@ -101,7 +100,8 @@ def registry_key_enum_values(key):
 
 def find_path_from_registry_generated_with_bentley_wix(product_name, major_version):
     """
-    Returns the installation directory for the application installed with Bentley Wix installer framework
+    Returns the installation directory for the application installed with Bentley Wix installer
+    framework
     :param str product_name: The name of the product (ex: Plaxis2D, Plaxis3D)
     :param int major_version: The major version of the product
     :return:
@@ -152,8 +152,8 @@ class OtherPlaxisInstanceConnectorException(PlaxisConnectorException):
 
 class PlaxisConnector(object):
     """
-    This class is used to start PLAXIS input application and make the plxscripting server available to be used by
-    clients
+    This class is used to start PLAXIS input application and make the plxscripting server available
+    to be used by clients
     """
 
     PASSWORD_SIZE = 20
@@ -169,12 +169,13 @@ class PlaxisConnector(object):
         major_version=None,
     ):
         """
-        :param str plx_path: Path of the PLAXIS application to open (if it's not provided than it will try to find
-        one trough the registry
-        :param float timeout: Number of seconds that it will wait for the plxscripting server to be ready before
-        raising a TimeoutPlaxisConnectorException
+        :param str plx_path: Path of the PLAXIS application to open (if it's not provided than it
+            will try to find one trough the registry
+        :param float timeout: Number of seconds that it will wait for the plxscripting server to be
+            ready before raising a TimeoutPlaxisConnectorException
         :param str plx_server_name: The name of the PLAXIS server name ('PLAXIS 2D' or 'PLAXIS 3D')
-        :param list extra_args: List of extra arguments that will be passed when starting the PLAXIS application
+        :param list extra_args: List of extra arguments that will be passed when starting the PLAXIS
+            application
         :param bool is_input: True will open Input. False will open Output
         :param str password: sets password to communicate with the PLAXIS server
         :param int major_version: The major version of the PLAXIS application to connect
@@ -284,11 +285,15 @@ class PlaxisConnector(object):
 
     def _get_plaxis_pid(self):
         for process in psutil.process_iter():
-            if process.name().lower() in self._get_server_executables():
-                if not process.parent():
-                    return process.pid
-                elif process.parent().name().lower() not in self._get_server_executables():
-                    return process.pid
+            try:
+                if process.name().lower() in self._get_server_executables():
+                    if not process.parent():
+                        return process.pid
+                    elif process.parent().name().lower() not in self._get_server_executables():
+                        return process.pid
+            except (AttributeError, psutil.NoSuchProcess):
+                # Process has already terminated, just move on to the next one
+                pass
         return False
 
     def _check_no_other_plaxis_is_running(self):
