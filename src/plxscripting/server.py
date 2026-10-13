@@ -114,15 +114,15 @@ class InputProcessor(object):
         try:
             return param.get_cmd_line_repr()
         except AttributeError:  # param has no appropriate method -> maybe it's a primitive
-            # strings need to wrapped with quotes (depending on whether they contain quotes themselves)
+            # strings need to wrapped with quotes
+            # (depending on whether they contain quotes themselves)
             if is_str(param):
                 for wrapper in plx_string_wrappers:
-                    if not wrapper in param:
+                    if wrapper not in param:
                         return wrapper + param + wrapper
                 raise PlxScriptingLocalError(
                     "Cannot convert string parameter to valid Plaxis string"
-                    " representation, try removing some quotes: "
-                    + param
+                    " representation, try removing some quotes: " + param
                 )
             elif isinstance(param, (tuple, list)):  # tuples/lists wrapped with parens
                 return "(" + self.params_to_string(param) + ")"
@@ -226,9 +226,9 @@ class ResultHandler(object):
         self._last_response = namedobjects_response[JSON_EXTRAINFO]
 
         if is_namedobject_successful:
-            return self._create_proxies_from_returned_objects(
-                [namedobjects_response[JSON_RETURNED_OBJECT]]
-            )
+            return self._create_proxies_from_returned_objects([
+                namedobjects_response[JSON_RETURNED_OBJECT]
+            ])
         else:
             raise PlxScriptingError(
                 "Unsuccessful command:\n" + namedobjects_response[JSON_EXTRAINFO]
@@ -349,7 +349,8 @@ class ResultHandler(object):
             property_names = single_property_json[JSON_PROPERTIES]
             if attr_name in property_names:
                 attribute = property_names[attr_name]
-                # TODO: work out how to "proxify" non-staged primitives considering the ones in UserFeatures
+                # TODO: work out how to "proxify" non-staged primitives considering the ones in
+                #  UserFeatures
                 if isinstance(attribute, dict):
                     # Staged intrinsic properties are different from normal
                     # intrinsic properties because their owner is an object
@@ -417,7 +418,8 @@ class ResultHandler(object):
 
         guid = returned_object[JSON_GUID]
 
-        # cast to str needed for Py2.7, where otherwise a potential unicode-type result object could lead to problems
+        # cast to str needed for Py2.7, where otherwise a potential unicode-type result object could
+        # lead to problems
         plx_obj_type = str(returned_object[JSON_TYPE])
 
         is_listable = returned_object[JSON_ISLISTABLE]
@@ -427,7 +429,8 @@ class ResultHandler(object):
         # proxies, we still need to identify them as intrprops and create the
         # appropriate proxy objects for them.
 
-        # cannot simply write "if not owner", because proxies may implement __bool__ and return False even if the owner does exist
+        # cannot simply write "if not owner", because proxies may implement __bool__ and
+        # return False even if the owner does exist
         if owner is None:
             if JSON_OWNERGUID in returned_object:
                 owner = self.proxy_factory.get_proxy_object_if_exists(
@@ -445,7 +448,9 @@ class ResultHandler(object):
                 # dealing with here, prop_name is *also* unknown and we can
                 # therefore not instantiate the property ourselves!
                 if self.proxy_factory.get_proxy_object_if_exists(guid) is None:
-                    # also here cannot simply write "if not self.proxy_factory.get_proxy_object_if_exists(...)" for similar reasons as above
+                    # also here cannot simply write
+                    # "if not self.proxy_factory.get_proxy_object_if_exists(...)"
+                    # for similar reasons as above
                     self.server.get_object_attributes(owner)
 
         return self.proxy_factory.create_plx_proxy_object(
@@ -835,7 +840,7 @@ def new_server(
     if port is None:
         try:
             port = int(_get_argument(ARG_APP_SERVER_PORT))
-        except:
+        except Exception:
             port = 10000
 
     if password is None:

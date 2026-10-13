@@ -21,7 +21,6 @@ import os
 import sys
 import code
 
-from distutils.version import StrictVersion
 from .const import (
     ARG_APP_SERVER_ADDRESS,
     ARG_APP_SERVER_PORT,
@@ -41,7 +40,11 @@ def get_IPython_module():
     try:
         import IPython
 
-        if StrictVersion(IPython.__version__) >= StrictVersion("1.1.0"):
+        version_major, version_minor, *_ = IPython.__version__.split(".")
+
+        if int(version_major) == 1 and int(version_minor) >= 1:
+            return IPython
+        elif int(version_major) > 1:
             return IPython
         else:
             return None
@@ -129,7 +132,8 @@ def start_console(address, port, appservertype, password):
     server_object_name = "s_{}".format(APP_SERVER_TYPE_TO_VARIABLE_SUFFIX[appservertype])
     global_object_name = "g_{}".format(APP_SERVER_TYPE_TO_VARIABLE_SUFFIX[appservertype])
 
-    # Remove the other command line options as it would otherwise cause the terminal to print its usage.
+    # Remove the other command line options as it would otherwise cause the terminal to print its
+    # usage.
     sys.argv = sys.argv[0:1]
     qtconsole = get_jupyter_qt_console_module()
     starting_message = build_instructions(address, port, server_object_name, global_object_name)
@@ -162,8 +166,8 @@ def start_console(address, port, appservertype, password):
 
 def set_interpreter_behaviour(server):
     """
-    Changes the error mode behaviour of the connection made to Plaxis Scripting Server to launch an interactive
-    interpreter
+    Changes the error mode behaviour of the connection made to Plaxis Scripting Server to launch an
+    interactive interpreter
     :param server: The Plaxis Scripting Server object to set the interpreter behaviour
     """
     caller_frame = sys._getframe(1)
@@ -207,8 +211,8 @@ def open_ipython_or_interactive_console(namespace, pre_banner=""):
 
 
 def inplace_console():
-    """Using either IPython or the Python console itself, Jupyter QtConsole doesn't allow passing namespaces
-    This is to be used inline while using the SciTE editor included with PLAXIS"""
+    """Using either IPython or the Python console itself, Jupyter QtConsole doesn't allow passing
+    namespaces his is to be used inline while using the SciTE editor included with PLAXIS"""
     invoking_module_namespace = sys._getframe(1).f_locals
     open_ipython_or_interactive_console(invoking_module_namespace)
 

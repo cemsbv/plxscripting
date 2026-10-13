@@ -33,6 +33,7 @@ from .plxproxy import (
     PlxProxyIPEnumeration,
     PlxProxyIPStaged,
 )
+from .const import JSON_SUCCESS, JSON_ENUMVALUES, JSON_QUERIES, JSON_EXTRAINFO
 
 TYPE_BOOLEAN = "Boolean"
 TYPE_TEXT = "Text"
@@ -43,8 +44,6 @@ TYPE_ENUMERATION = "Enumeration"
 
 ENUM = "enum"
 STAGED = "staged"
-
-from .const import JSON_SUCCESS, JSON_ENUMVALUES, JSON_QUERIES, JSON_EXTRAINFO
 
 
 def is_primitive(plx_type):

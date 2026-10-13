@@ -1,4 +1,4 @@
-"""
+r"""
 Purpose: Intended for quickly starting Jupyter notebook
 Usages:
     python run_jupyter.py --AppServerAddress=localhost --AppServerPort=10 --AppServerPassword=123
@@ -26,19 +26,9 @@ language governing rights and limitations under the PPL.
 import sys
 import os
 import shutil
+
 from argparse import ArgumentTypeError
 from plxscripting.interactive import create_parser, set_paths_of_activated_conda_environment
-
-try:
-    import notebook.notebookapp
-except Exception as e:
-    # The most likely cause for the import to have failed is due to the lack of
-    # some paths in the "PATH" environment variable. This is currently
-    # happening with a Python 3.7 environment
-    print(e)
-    set_paths_of_activated_conda_environment()
-    import notebook.notebookapp
-
 from plxscripting.plaxis_jupyter_kernel import (
     ENV_VAR_PLAXIS_SERVER_PASSWORD,
     ENV_VAR_PLAXIS_SERVER_APP_TYPE,
@@ -47,6 +37,8 @@ from plxscripting.plaxis_jupyter_kernel import (
 )
 from plxscripting.easy import new_server
 from plxscripting.const import PLAXIS_2D, PLAXIS_3D, INPUT, OUTPUT, SOILTEST
+
+notebook_app = None
 
 NOTEBOOK_TEMPLATE_PATHS = {
     PLAXIS_2D: {
@@ -61,6 +53,31 @@ NOTEBOOK_TEMPLATE_PATHS = {
     },
 }
 EMPTY_NOTEBOOK_PATH = "empty_notebook.ipynb"
+
+
+def get_notebook_app():
+    import notebook
+
+    major_version = int(notebook.__version__.split(".")[0])
+    if major_version >= 7:
+        import notebook.app
+
+        return notebook.app
+    else:
+        import notebook.notebookapp
+
+        return notebook.notebookapp
+
+
+try:
+    notebook_app = get_notebook_app()
+except Exception as e:
+    # The most likely cause for the import to have failed is due to the lack of
+    # some paths in the "PATH" environment variable. This is currently
+    # happening with a Python 3.7 environment
+    print(e)
+    set_paths_of_activated_conda_environment()
+    notebook_app = get_notebook_app()
 
 
 def readable(path, is_dir=False):
@@ -134,4 +151,4 @@ if __name__ == "__main__":
         if not os.path.isfile(args.notebook):
             create_notebook(args.notebook, s.is_2d, args.AppServerType)
         notebook_args.append("{}".format(args.notebook))
-    sys.exit(notebook.notebookapp.main(notebook_args))
+    sys.exit(notebook_app.main(notebook_args))

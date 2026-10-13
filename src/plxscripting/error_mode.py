@@ -25,8 +25,8 @@ VALID_MODIFIERS = (RETRY, NOCLEAR, PRECONDITION)
 
 class ErrorMode(object):
     """
-    Class used to manage the triggered behaviour that happens when an internal server error occurs after making a
-    request to Plaxis Remote Scripting Server
+    Class used to manage the triggered behaviour that happens when an internal server error occurs
+    after making a request to Plaxis Remote Scripting Server
     """
 
     def __init__(self, *args):

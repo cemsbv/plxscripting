@@ -1,7 +1,8 @@
 """
-Purpose: Tokenizing is the process of splitting a string into substrings of specific types (tokens) understood by the
-command line in PLAXIS applications. E.g. a token may end up being interpreted as an object name, a numerical value,
-etc. Tokenizing does not perform any model modifications: it merely parses a string into tokens.
+Purpose: Tokenizing is the process of splitting a string into substrings of specific types (tokens)
+understood by the command line in PLAXIS applications. E.g. a token may end up being interpreted as
+an object name, a numerical value, etc. Tokenizing does not perform any model modifications: it
+merely parses a string into tokens.
 
 Copyright (c) Plaxis bv. All rights reserved.
 
@@ -44,8 +45,8 @@ class TokenBase(ABC):
         for key in raw_data:
             value = raw_data[key]
 
-            # Position return from the HTTP REST API is 1-based so we need to convert it to better consistency with
-            # python where position of a character in a string is 0-based
+            # Position return from the HTTP REST API is 1-based so we need to convert it to better
+            # consistency with python where position of a character in a string is 0-based
             if key == KEY_POSITION:
                 value -= 1
             setattr(self, key, value)
@@ -197,7 +198,8 @@ def token_factory(token_raw_data):
 
 class TokenizerResultHandler(object):
     """
-    Helper class which parses the output of the Plaxis server tokenizer resource into a python object
+    Helper class which parses the output of the Plaxis server tokenizer resource into a python
+    object
     """
 
     def __init__(self, response):

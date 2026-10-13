@@ -1,9 +1,9 @@
-"""
+r"""
 Purpose: Intended for quickly starting an interactive Python session
     with import of the scripting wrapper. Usage:
 
-	python interactive.py
-	python "c:\Program Files (x86)\Plaxis\PLAXIS 3D\plxscripting\interactive.py"
+        python interactive.py
+        python "c:\Program Files (x86)\Plaxis\PLAXIS 3D\plxscripting\interactive.py"
 
 Copyright (c) Plaxis bv. All rights reserved.
 
@@ -25,6 +25,17 @@ import os
 import os.path
 import sys
 import argparse
+
+from plxscripting.const import (
+    ARG_APP_SERVER_ADDRESS,
+    ARG_APP_SERVER_PORT,
+    ARG_PASSWORD,
+    ARG_APP_SERVER_TYPE,
+    INPUT,
+    OUTPUT,
+    SOILTEST,
+)
+from plxscripting.console import start_console
 
 
 def set_paths_of_activated_conda_environment():
@@ -73,17 +84,6 @@ else:
 
     found_module = imp.find_module("plxscripting", paths)
     plxscripting = imp.load_module("plxscripting", *found_module)
-
-from plxscripting.const import (
-    ARG_APP_SERVER_ADDRESS,
-    ARG_APP_SERVER_PORT,
-    ARG_PASSWORD,
-    ARG_APP_SERVER_TYPE,
-    INPUT,
-    OUTPUT,
-    SOILTEST,
-)
-from plxscripting.console import start_console
 
 
 def create_parser():
