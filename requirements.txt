@@ -18,7 +18,7 @@ coveralls==3.3.1
     # via plxscripting (pyproject.toml)
 debugpy==1.8.0
     # via ipykernel
-decorator==5.1.1
+decorator==5.3.1
     # via ipython
 docopt==0.6.2
     # via coveralls
