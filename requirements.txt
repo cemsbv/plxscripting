@@ -86,7 +86,7 @@ pyzmq==25.1.1
     # via
     #   ipykernel
     #   jupyter-client
-requests==2.31.0
+requests==2.33.0
     # via
     #   coveralls
     #   plxscripting (pyproject.toml)
