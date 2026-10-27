@@ -76,7 +76,7 @@ pure-eval==0.2.2
     # via stack-data
 pycryptodome==3.19.0
     # via plxscripting (pyproject.toml)
-pygments==2.16.1
+pygments==2.20.0
     # via ipython
 pytest==7.4.3
     # via plxscripting (pyproject.toml)
